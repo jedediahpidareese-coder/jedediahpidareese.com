@@ -1,0 +1,809 @@
+/* ============================================================================
+   Jedediah Pida-Reese — personal academic site
+   Design notes: scholarly Japanese sensibility — sumi ink on washi paper,
+   restrained palette, generous ma (negative space), classical serif typography
+   paired with Noto Serif JP for accents. No frameworks, no build step.
+   To edit colors, fonts, or spacing, change the custom properties below.
+   ============================================================================ */
+
+:root {
+  /* Palette ---------------------------------------------------------------- */
+  --ink:         #1a1a1a;   /* sumi 墨 — body text */
+  --ink-soft:    #4f4a42;   /* secondary text */
+  --paper:       #f5f1e8;   /* washi 和紙 — background */
+  --paper-deep:  #ebe5d3;
+  --rule:        #d9d2c3;   /* hairline divider */
+  --indigo:      #2a4858;   /* 藍 ai — links, accents */
+  --indigo-deep: #1a2f3d;
+  --benikara:    #7a2e2a;   /* used very sparingly */
+
+  /* Type ------------------------------------------------------------------- */
+  --serif:       "EB Garamond", "Noto Serif JP", Georgia, "Times New Roman", serif;
+  --jp:          "Noto Serif JP", "EB Garamond", serif;
+  --base:        1.0625rem;
+  --measure:     42rem;
+  --gutter:      clamp(1.5rem, 5vw, 4rem);
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--base);
+  line-height: 1.65;
+  font-feature-settings: "kern", "liga", "onum";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Hokusai's Great Wave as a faint, fixed page-wide watermark.
+   Sits behind all content; opacity tuned low enough that body text
+   remains comfortably legible on top. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("../img/hero.jpg");
+  background-size: cover;
+  background-position: 35% 50%;
+  background-repeat: no-repeat;
+  opacity: 0.07;
+  z-index: -1;
+  pointer-events: none;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+::selection { background: var(--indigo); color: var(--paper); }
+
+/* Layout shell ============================================================== */
+
+.shell {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  position: relative;
+}
+
+/* Header and footer fill the shell. */
+.site-header,
+.site-footer-inner {
+  width: 100%;
+}
+
+/* Main fills the shell too — no more narrow centered column.
+   Prose blocks inside cap themselves and center for readability. */
+main {
+  width: 100%;
+}
+
+main > h1 { max-width: 60rem; margin-left: auto; margin-right: auto; }
+main > .lede {
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.3rem;
+  line-height: 1.5;
+  margin-bottom: 2.5rem;
+  color: var(--ink);
+  font-style: italic;
+}
+main > p {
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* On home the lede now lives inside the profile (which floats around the portrait). */
+
+/* Header =================================================================== */
+
+.site-header {
+  padding: 3.5rem 0 1.75rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 3rem;
+}
+
+.site-id {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  margin-bottom: 1.75rem;
+}
+
+.site-id-text { min-width: 0; flex: 1; }
+
+/* Hanko 印 — Jed's personal seal as carved in Japan.
+   慈恵努 — ateji (当て字) for ジェド (Jed): the kanji read ji-e-do phonetically
+   while each carries its own meaning (compassion · blessing · endeavor).
+   The vermilion field, carved-feeling rough edges, ink-density grain, and
+   inner carved border are rendered by hanko.svg. The kanji sit in HTML on
+   top so they render crisply in the page's loaded Noto Serif JP. */
+.hanko {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  background: url("../img/hanko.svg") center / 100% 100% no-repeat;
+  color: var(--paper);
+  font-family: var(--jp);
+  font-weight: 700;
+  font-size: 0.86rem;
+  line-height: 1;
+  letter-spacing: 0;
+  text-decoration: none;
+  border: 0;
+  padding: 0.2rem 0;
+  /* Slight tilt — as if pressed by hand, never perfectly square to the page */
+  transform: rotate(-1.8deg);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-shadow: 0 0 1px rgba(140, 20, 16, 0.4);
+}
+
+.hanko span {
+  display: block;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.hanko:hover, .hanko:focus {
+  background: #a01d18;
+  border: 0;
+  transform: rotate(-1.5deg);
+}
+
+.site-name {
+  font-family: var(--serif);
+  font-size: 1.875rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  margin: 0 0 0.25rem;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.site-name a { color: inherit; text-decoration: none; border: 0; }
+
+.site-tagline {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+.site-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  border: 0;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+
+.site-nav a:hover,
+.site-nav a:focus,
+.site-nav a[aria-current="page"] {
+  border-color: var(--indigo);
+  color: var(--indigo-deep);
+}
+
+/* Typography =============================================================== */
+
+main { padding-bottom: 4rem; }
+
+h1, h2, h3, h4 {
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.lede {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1.18rem;
+  line-height: 1.5;
+  margin: 0 0 2.5rem;
+  max-width: 32rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+}
+
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  background: var(--indigo);
+  flex-shrink: 0;
+  transform: translateY(-0.35em);
+}
+
+h3 {
+  font-size: 1.08rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+p { margin: 0 0 1.05rem; }
+
+a {
+  color: var(--indigo);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+a:hover, a:focus {
+  color: var(--indigo-deep);
+  border-color: var(--indigo);
+}
+
+ul, ol { padding-left: 1.25rem; margin: 0 0 1.05rem; }
+li { margin-bottom: 0.4rem; }
+
+strong { font-weight: 600; }
+em { font-style: italic; }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 2.5rem 0;
+}
+
+blockquote {
+  margin: 1.25rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 2px solid var(--indigo);
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* Home: profile section — portrait floats left, bio wraps and fills below.
+   Avoids the dead-space problem that comes with a fixed 2-col grid. */
+
+.profile {
+  display: block;
+  margin: 0;
+}
+
+.profile::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.profile-portrait {
+  width: 22rem;
+  max-width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border: 1px solid var(--rule);
+  filter: saturate(0.95) contrast(1.02);
+  display: block;
+}
+
+@media (min-width: 720px) {
+  .profile-portrait {
+    float: left;
+    margin: 0.4rem 2.75rem 1rem 0;
+    shape-outside: margin-box;
+  }
+}
+
+.profile > .lede {
+  font-size: 1.34rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--ink);
+  margin: 0 0 1.5rem;
+  max-width: none;
+}
+
+.profile > p {
+  font-size: 1.07rem;
+  line-height: 1.7;
+  max-width: none;
+  margin-bottom: 1.25rem;
+}
+
+.profile > p:last-child { margin-bottom: 0; }
+
+@media (max-width: 720px) {
+  .profile-portrait { margin: 0 auto 1.5rem; max-width: 18rem; }
+}
+
+/* Horizontal facts strip — sits below the floated portrait + bio.
+   `clear: both` ensures it starts below the portrait even on short bios. */
+.profile-meta {
+  clear: both;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1.6rem 2.25rem;
+  padding-top: 1.75rem;
+  margin: 2.25rem 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.profile-meta .meta-item { min-width: 0; }
+
+.profile-meta dt {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 500;
+  font-style: normal;
+  margin: 0 0 0.35rem;
+}
+
+.profile-meta dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.profile-meta .profile-periods {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  color: var(--ink);
+  letter-spacing: normal;
+}
+
+.profile-meta .profile-periods-jp {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--jp);
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+/* Publication / paper entries — 2-column with status rail on the left ====== */
+
+.entry {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 2.5rem;
+  padding: 1.75rem 0 2rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.entry:last-of-type { border-bottom: 0; }
+
+.entry-side {
+  padding-top: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.entry-image {
+  width: 100%;
+  max-width: 8rem;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border: 1px solid var(--rule);
+  filter: sepia(0.18) saturate(0.85) contrast(1.04);
+  opacity: 0.92;
+  transition: opacity 240ms ease, filter 320ms ease, transform 320ms ease;
+  display: block;
+}
+
+.entry:hover .entry-image,
+.entry:focus-within .entry-image {
+  opacity: 1;
+  filter: sepia(0) saturate(1) contrast(1);
+  transform: scale(1.01);
+}
+
+@media (max-width: 540px) {
+  .entry-image { max-width: 6rem; }
+}
+
+.entry-status {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.65rem;
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-style: normal;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.entry-status.published {
+  border-color: var(--indigo);
+  color: var(--indigo);
+}
+
+.entry-year {
+  display: block;
+  margin-top: 0.55rem;
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.entry-main { min-width: 0; }
+
+.entry-title {
+  font-size: 1.18rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+  letter-spacing: 0.005em;
+  line-height: 1.3;
+}
+
+.entry-meta {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  margin: 0 0 0.85rem;
+}
+
+.entry-abstract {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--ink);
+  margin: 0 0 0.85rem;
+  max-width: 52rem;
+}
+
+.entry-links {
+  font-size: 0.92rem;
+}
+
+.entry-links a {
+  margin-right: 1.25rem;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 540px) {
+  .entry {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+}
+
+/* CV layout ================================================================ */
+
+.cv-section { margin-top: 2rem; }
+
+.cv-row {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 2.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+
+.cv-row:last-child { border-bottom: 0; }
+
+.cv-date {
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.cv-detail { margin: 0; }
+
+.cv-detail strong { font-weight: 600; }
+
+.cv-sub { display: block; color: var(--ink-soft); font-size: 0.95rem; margin-top: 0.15rem; }
+
+.cv-pdf-link {
+  display: inline-block;
+  margin: 0.5rem 0 1.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--indigo);
+  color: var(--indigo);
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.cv-pdf-link:hover, .cv-pdf-link:focus {
+  background: var(--indigo);
+  color: var(--paper);
+  border-color: var(--indigo);
+}
+
+/* Teaching evaluations / quotes ============================================= */
+
+.quote-block {
+  margin: 0;
+  padding: 0.4rem 0 0.4rem 1.1rem;
+  border-left: 2px solid var(--rule);
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+
+.quote-block cite {
+  display: block;
+  font-style: normal;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  margin-top: 0.4rem;
+}
+
+.quote-block cite::before { content: "— "; }
+
+.quote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: 1.25rem 2rem;
+  margin: 0.75rem 0 2.5rem;
+}
+
+/* Hero banner (home only) ================================================== */
+
+.hero {
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto 3.5rem;
+  position: relative;
+  aspect-ratio: 1200 / 380;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--paper-deep);
+}
+
+.hero-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .hero { aspect-ratio: 5 / 2; }
+}
+
+/* Contact card ============================================================= */
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 540px) {
+  .contact-grid { grid-template-columns: 10rem 1fr; gap: 2.5rem; }
+}
+
+.contact-label {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.contact-value { margin: 0; }
+
+/* Footer =================================================================== */
+
+.site-footer {
+  margin-top: 5rem;
+  position: relative;
+}
+
+.seigaiha {
+  width: 100%;
+  height: 56px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 56'><g fill='none' stroke='%23b9af96' stroke-width='1'><circle cx='0' cy='56' r='28'/><circle cx='0' cy='56' r='20'/><circle cx='0' cy='56' r='12'/><circle cx='0' cy='56' r='4'/><circle cx='30' cy='56' r='28'/><circle cx='30' cy='56' r='20'/><circle cx='30' cy='56' r='12'/><circle cx='30' cy='56' r='4'/><circle cx='60' cy='56' r='28'/><circle cx='60' cy='56' r='20'/><circle cx='60' cy='56' r='12'/><circle cx='60' cy='56' r='4'/><circle cx='15' cy='28' r='28'/><circle cx='15' cy='28' r='20'/><circle cx='15' cy='28' r='12'/><circle cx='15' cy='28' r='4'/><circle cx='45' cy='28' r='28'/><circle cx='45' cy='28' r='20'/><circle cx='45' cy='28' r='12'/><circle cx='45' cy='28' r='4'/></g></svg>");
+  background-repeat: repeat-x;
+  background-position: center bottom;
+  background-size: 60px 56px;
+  opacity: 0.85;
+}
+
+.site-footer-inner {
+  padding: 1.5rem 0 2.5rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.footer-kanji {
+  font-family: var(--jp);
+  letter-spacing: 0.25em;
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
+/* Mobile =================================================================== */
+
+@media (max-width: 640px) {
+  :root { --base: 1rem; }
+  .site-header { padding: 2.25rem 0 1.25rem; margin-bottom: 2.25rem; }
+  .site-name { font-size: 1.5rem; }
+  h1 { font-size: 1.85rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.25rem; }
+  .lede { font-size: 1.05rem; }
+  .cv-row { grid-template-columns: 4.5rem 1fr; gap: 0.85rem; }
+  .site-nav { gap: 1.25rem; }
+  .site-nav a { font-size: 0.82rem; }
+}
+
+/* ============================================================================
+   Motion — culturally-flavored entrance, page transitions, ambient drift
+   Restrained throughout; honors prefers-reduced-motion.
+
+   Concept:
+   - On first load, main content unfurls from top to bottom like a kakemono
+     (掛物, hanging scroll) being unrolled.
+   - Cross-page navigation slides actual shōji (障子) panels — washi paper with
+     wooden kumiko lattice — across the viewport, meeting at center, then
+     parting on the next page.
+   - The footer wave (seigaiha 青海波) drifts horizontally in a slow ambient loop,
+     evoking ocean motion — a nod to Hokusai's wave imagery.
+   ============================================================================ */
+
+@keyframes kakemono-unfurl {
+  from { clip-path: inset(0 0 100% 0); opacity: 0.85; }
+  to   { clip-path: inset(0 0 0 0);    opacity: 1; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes stamp-in {
+  0%   { opacity: 0; transform: scale(1.22) rotate(7deg); }
+  60%  { opacity: 0.95; }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes line-draw {
+  from { width: 0; opacity: 0.3; }
+  to   { width: 1.5rem; opacity: 1; }
+}
+
+@keyframes wave-drift {
+  from { background-position-x: 0; }
+  to   { background-position-x: 60px; }
+}
+
+/* On-page entrance animations are intentionally kept narrow so they don't
+   conflict with the View Transition snapshot (which captures the page at
+   t=0; any animation that hides content with backwards fill makes the
+   snapshot blank). Line-draw on H2 rules is the only entrance kept. */
+h2::before {
+  animation: line-draw 480ms ease-out 380ms backwards;
+}
+
+.seigaiha {
+  animation: wave-drift 26s linear infinite;
+}
+
+/* Cross-page transition: right-to-left page slide.
+   Old page exits to the right while fading. New page enters from the left.
+   A nod to traditional Japanese book layouts (read right-to-left), without
+   going full literal page-turn. Chromium today; other browsers navigate
+   normally and the on-page entrance animations still run as fallback. */
+@view-transition { navigation: auto; }
+
+::view-transition-old(root) {
+  animation: 400ms ease-in both vt-slide-out;
+}
+
+::view-transition-new(root) {
+  animation: 520ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both vt-slide-in;
+}
+
+@keyframes vt-slide-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(28px); }
+}
+
+@keyframes vt-slide-in {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
+/* Active-page mark: small vermilion square before the current nav item.
+   Echoes the hanko aesthetic — a little ink dot saying "you are here." */
+.site-nav a[aria-current="page"] {
+  border-color: var(--indigo);
+}
+
+.site-nav a[aria-current="page"]::before {
+  content: "";
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  background: #b8231c;
+  margin-right: 0.5rem;
+  vertical-align: 0.15em;
+  transform: translateY(-1px);
+}
+
+
+.hanko:hover, .hanko:focus-visible {
+  transform: rotate(-3.5deg) scale(1.05);
+}
+
+/* Reduced motion — kill all animation/transition for users who prefer it. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  ::view-transition-group(root) { animation: none !important; }
+}
+
+/* Print (CV) =============================================================== */
+
+@media print {
+  body { background: white; color: black; font-size: 10.5pt; }
+  .site-nav, .kanji-mark, .seigaiha, .site-footer-inner, .cv-pdf-link { display: none; }
+  .shell { padding: 0; max-width: 100%; }
+  .site-header { border-bottom: 1px solid #000; padding: 0 0 0.5rem; margin-bottom: 1.25rem; }
+  .site-name { font-size: 1.5rem; }
+  a { color: black; border: 0; }
+  .cv-row { padding: 0.4rem 0; break-inside: avoid; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.1rem; margin-top: 1.25rem; }
+}

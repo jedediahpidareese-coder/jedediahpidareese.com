@@ -1,0 +1,14 @@
+# Drafts and work-in-progress papers — do not publish
+Papers/
+
+# OS / cloud-sync metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~

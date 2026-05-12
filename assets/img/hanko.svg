@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Personal seal (印 hanko) — vermilion field with hand-carved characteristics.
+
+   - Outer body: cinnabar-vermilion fill
+   - Edges roughened by a fractal-noise displacement map, the way stone or
+     boxwood seals have when carved by hand
+   - Surface "ink grain": subtle dark-red speckle suggesting uneven ink takeup
+   - Inner carved border: a thin cream line just inside the edge, also
+     displaced so it doesn't look mechanically printed
+   - The kanji 慈恵努 are layered over this in HTML so the seal renders crisply
+     in the page's loaded Noto Serif JP font.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <!-- Carved-edge displacement: low-frequency noise displaces edges -->
+    <filter id="carved" x="-6%" y="-6%" width="112%" height="112%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="3"/>
+      <feDisplacementMap in="SourceGraphic" scale="2.4"/>
+    </filter>
+
+    <!-- Ink density grain: high-frequency dark speckle, clipped to source -->
+    <filter id="ink-grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="2" seed="11"/>
+      <feColorMatrix values="0 0 0 0 0.18
+                              0 0 0 0 0
+                              0 0 0 0 0
+                              0 0 0 0.32 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+
+  <!-- Vermilion stamp body, edges roughened -->
+  <rect x="4" y="4" width="92" height="92" fill="#bc2620" filter="url(#carved)"/>
+
+  <!-- Ink-density grain over the body -->
+  <rect x="4" y="4" width="92" height="92" filter="url(#ink-grain)"/>
+
+  <!-- Inner carved border, also roughened -->
+  <rect x="10.5" y="10.5" width="79" height="79"
+        fill="none" stroke="#f5f1e8" stroke-width="0.9" stroke-opacity="0.7"
+        filter="url(#carved)"/>
+</svg>
