@@ -14,9 +14,15 @@
   </url>
   <url>
     <loc>https://jedediahpidareese.com/teaching.html</loc>
-    <lastmod>2026-05-12</lastmod>
+    <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jedediahpidareese.com/evaluations.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://jedediahpidareese.com/cv.html</loc>

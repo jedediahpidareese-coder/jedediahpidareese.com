@@ -511,6 +511,63 @@ blockquote {
   }
 }
 
+/* Evaluation tables ======================================================== */
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 0.75rem 0 2rem;
+}
+
+.table-context {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+table.eval-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  min-width: 30rem;
+}
+
+table.eval-table th,
+table.eval-table td {
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+table.eval-table thead th {
+  font-weight: 600;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--ink-soft);
+  font-style: normal;
+}
+
+table.eval-table tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+table.eval-table tbody tr:last-child td,
+table.eval-table tbody tr:last-child th {
+  border-bottom: 0;
+}
+
+table.eval-table td:first-child,
+table.eval-table th:first-child { padding-left: 0; }
+
+table.eval-table td:last-child,
+table.eval-table th:last-child { padding-right: 0; }
+
 /* CV layout ================================================================ */
 
 .cv-section { margin-top: 2rem; }
