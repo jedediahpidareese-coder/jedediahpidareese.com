@@ -12,3 +12,7 @@ $RECYCLE.BIN/
 .idea/
 *.swp
 *~
+
+# Signed/source documents — never publish
+*_signed.pdf
+facultygrantsummer2026_drpida_signed.pdf
