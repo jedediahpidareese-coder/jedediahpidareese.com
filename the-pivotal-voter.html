@@ -1,0 +1,1762 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pivotal Voter</title>
+<meta name="description" content="An interactive account of how economists calculate the chance that one vote decides an election, built on official returns from every federal and state legislative race on record.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Noto+Serif+JP:wght@400;500;600&display=swap">
+<style>
+/* ===========================================================================
+   The Pivotal Voter
+   Visual system inherited from jedediahpidareese.com: sumi ink on washi paper,
+   EB Garamond, indigo accents, hairline rules, generous negative space.
+   Self-contained so the page renders identically on the site and off it.
+   Two chart hues are lifted out of the site's indigo and benikara to clear the
+   colour-vision and contrast checks against the washi ground.
+   =========================================================================== */
+
+:root {
+  --ink:        #1a1a1a;
+  --ink-soft:   #4f4a42;
+  --ink-faint:  #7a736a;
+  --paper:      #f5f1e8;
+  --paper-deep: #ebe5d3;
+  --paper-lift: #fbf9f3;
+  --rule:       #d9d2c3;
+  --rule-soft:  #e6e0d2;
+  --indigo:     #2a4858;
+  --indigo-deep:#1a2f3d;
+  --benikara:   #7a2e2a;
+
+  --series-a:   #1c7aa8;   /* the model under discussion */
+  --series-b:   #b8482e;   /* the reader's own position  */
+  --series-a-soft: rgba(28,122,168,0.14);
+  --series-b-soft: rgba(184,72,46,0.14);
+
+  --serif: "EB Garamond", Georgia, "Times New Roman", serif;
+  --jp:    "Noto Serif JP", "EB Garamond", serif;
+  --measure: 40rem;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  font-feature-settings: "kern", "liga", "onum";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell { max-width: 76rem; margin: 0 auto; padding: 0 var(--gutter); }
+
+a { color: var(--indigo); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: var(--benikara); }
+:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+
+/* --- masthead ------------------------------------------------------------ */
+.site-header {
+  display: flex; flex-wrap: wrap; gap: 1rem 2rem;
+  align-items: baseline; justify-content: space-between;
+  padding: 2rem 0 1rem;
+}
+.site-id { display: flex; align-items: center; gap: 0.9rem; }
+.hanko {
+  font-family: var(--jp); font-size: 0.78rem; line-height: 1.05;
+  display: grid; place-content: center; text-align: center;
+  width: 2.6rem; height: 2.6rem; flex: 0 0 auto;
+  color: var(--paper); background: var(--benikara);
+  text-decoration: none; letter-spacing: 0;
+}
+.site-name { font-size: 1.15rem; font-weight: 600; margin: 0; letter-spacing: 0.01em; }
+.site-name a { color: var(--ink); text-decoration: none; }
+.site-tagline { margin: 0.1rem 0 0; font-size: 0.86rem; color: var(--ink-soft); }
+.site-nav { display: flex; gap: 1.4rem; font-size: 0.92rem; }
+.site-nav a { color: var(--ink-soft); text-decoration: none; }
+.site-nav a:hover { color: var(--benikara); }
+
+/* --- title block --------------------------------------------------------- */
+.masthead-rule { border: 0; border-top: 1px solid var(--rule); margin: 0 0 3.5rem; }
+
+.title-block { max-width: 48rem; margin: 0 auto 3.5rem; text-align: center; }
+.piece-mark {
+  font-family: var(--jp); font-size: 2rem; color: var(--benikara);
+  letter-spacing: 0.28em; margin: 0 0 1.2rem; padding-left: 0.28em;
+}
+h1 {
+  font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 400; line-height: 1.12;
+  margin: 0 0 1rem; text-wrap: balance; letter-spacing: -0.005em;
+}
+.standfirst {
+  font-size: 1.28rem; line-height: 1.5; font-style: italic;
+  color: var(--ink-soft); margin: 0 auto; max-width: 34rem; text-wrap: pretty;
+}
+.byline {
+  margin: 2rem 0 0; font-size: 0.82rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+
+/* --- prose --------------------------------------------------------------- */
+main { padding-bottom: 5rem; }
+.prose { max-width: var(--measure); margin-left: auto; margin-right: auto; }
+.prose > * + * { margin-top: 1.15em; }
+p { margin: 0; text-wrap: pretty; }
+
+section { margin-top: 4.5rem; }
+.section-head { max-width: var(--measure); margin: 0 auto 2rem; }
+.eyebrow {
+  font-size: 0.74rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 0.55rem;
+  display: flex; align-items: center; gap: 0.7rem;
+}
+.eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+h2 { font-size: 1.85rem; font-weight: 400; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font-size: 1.18rem; font-weight: 600; margin: 0 0 0.4rem; }
+
+.lede-note {
+  font-size: 0.96rem; color: var(--ink-soft); font-style: italic;
+  border-left: 2px solid var(--rule); padding-left: 1rem;
+}
+
+/* --- instruments --------------------------------------------------------- */
+.panel {
+  max-width: 62rem; margin: 2.25rem auto; background: var(--paper-lift);
+  border: 1px solid var(--rule); padding: clamp(1.1rem, 3vw, 2rem);
+}
+.panel-head { margin: 0 0 1.25rem; }
+.panel-title {
+  font-size: 0.76rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 0.35rem;
+}
+.panel-lead { font-size: 1rem; color: var(--ink-soft); margin: 0; max-width: 46rem; }
+
+.controls { display: grid; gap: 1.1rem 2rem; margin-bottom: 1.5rem; }
+.controls.two { grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.controls.three { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+
+.ctrl label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 1rem; font-size: 0.86rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.4rem;
+}
+.ctrl .val {
+  font-variant-numeric: tabular-nums lining-nums; font-size: 1rem;
+  letter-spacing: 0; text-transform: none; color: var(--ink); font-weight: 600;
+}
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 1.5rem;
+  background: transparent; cursor: pointer; margin: 0;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px; background: var(--rule); border-radius: 0;
+}
+input[type="range"]::-moz-range-track { height: 2px; background: var(--rule); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 0.85rem; height: 0.85rem;
+  border-radius: 50%; background: var(--indigo); margin-top: -0.39rem;
+  border: 2px solid var(--paper-lift);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 0.85rem; height: 0.85rem; border-radius: 50%; background: var(--indigo);
+  border: 2px solid var(--paper-lift);
+}
+select, input[type="number"], input[type="text"] {
+  font-family: var(--serif); font-size: 1rem; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--rule);
+  padding: 0.4rem 0.6rem; width: 100%;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+button {
+  font-family: var(--serif); font-size: 0.95rem; color: var(--paper);
+  background: var(--indigo); border: 1px solid var(--indigo);
+  padding: 0.45rem 1.1rem; cursor: pointer;
+}
+button:hover { background: var(--indigo-deep); border-color: var(--indigo-deep); }
+button.ghost { background: transparent; color: var(--indigo); }
+button.ghost:hover { background: var(--paper-deep); color: var(--indigo-deep); }
+
+/* --- readouts ------------------------------------------------------------ */
+.readout { display: grid; gap: 1px; background: var(--rule-soft); margin: 1.5rem 0 0; }
+.readout.two { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+.readout.three { grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+.stat { background: var(--paper-lift); padding: 1rem 1.1rem; }
+.stat-label {
+  font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 0.3rem;
+}
+.stat-value {
+  font-size: 1.6rem; line-height: 1.1; margin: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.stat-value.accent { color: var(--series-b); }
+.stat-note { font-size: 0.84rem; color: var(--ink-soft); margin: 0.35rem 0 0; }
+
+.hero-number {
+  font-size: clamp(2.6rem, 8vw, 4.4rem); line-height: 1; margin: 0;
+  font-variant-numeric: tabular-nums lining-nums; color: var(--indigo);
+}
+
+/* --- figures ------------------------------------------------------------- */
+figure { margin: 0; }
+.figwrap { overflow-x: auto; }
+svg { display: block; max-width: 100%; height: auto; }
+figcaption {
+  font-size: 0.86rem; color: var(--ink-soft); margin-top: 0.8rem;
+  max-width: 46rem; line-height: 1.5;
+}
+.legend {
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; margin: 0 0 0.7rem;
+  font-size: 0.85rem; color: var(--ink-soft);
+}
+.legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.swatch { width: 0.75rem; height: 0.75rem; flex: 0 0 auto; border-radius: 2px; }
+
+/* --- tables -------------------------------------------------------------- */
+.table-wrap { overflow-x: auto; margin: 1.5rem 0 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+caption {
+  text-align: left; font-size: 0.76rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--ink-faint); padding-bottom: 0.6rem;
+}
+th, td { padding: 0.42rem 0.7rem; text-align: left; border-bottom: 1px solid var(--rule-soft); }
+th {
+  font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 400; border-bottom: 1px solid var(--rule);
+}
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums lining-nums; }
+tbody tr:hover { background: var(--paper-deep); }
+tr.marked td { background: var(--series-b-soft); }
+
+/* --- formula ------------------------------------------------------------- */
+.formula {
+  margin: 1.6rem auto; max-width: var(--measure); text-align: center;
+  font-size: 1.22rem; line-height: 1.8; color: var(--ink);
+}
+.formula em { font-style: italic; }
+.formula .gloss {
+  display: block; font-size: 0.85rem; color: var(--ink-faint);
+  letter-spacing: 0.04em; margin-top: 0.5rem; font-style: normal;
+}
+details.math {
+  max-width: var(--measure); margin: 1.4rem auto; font-size: 0.95rem;
+  border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft);
+  padding: 0.7rem 0;
+}
+details.math summary {
+  cursor: pointer; color: var(--indigo); list-style: none;
+  font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;
+}
+details.math summary::-webkit-details-marker { display: none; }
+details.math summary::before { content: "＋ "; font-family: var(--jp); }
+details.math[open] summary::before { content: "－ "; }
+details.math > *:not(summary) { margin-top: 0.9rem; color: var(--ink-soft); }
+
+/* --- prediction prompt --------------------------------------------------- */
+.guess {
+  max-width: var(--measure); margin: 2rem auto; padding: 1.4rem 1.6rem;
+  border: 1px solid var(--rule); background: var(--paper-lift);
+}
+.guess-row { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin-top: 0.9rem; }
+.guess-row input { width: 9rem; }
+.guess-answer { margin-top: 1.1rem; font-size: 1.02rem; }
+.guess-answer[hidden] { display: none; }
+
+/* --- footer -------------------------------------------------------------- */
+.site-footer { border-top: 1px solid var(--rule); margin-top: 5rem; padding: 2rem 0 3rem; }
+.site-footer-inner {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
+  font-size: 0.84rem; color: var(--ink-faint);
+}
+.footer-mark { font-family: var(--jp); letter-spacing: 0.3em; }
+
+.sources { max-width: 52rem; margin: 0 auto; font-size: 0.92rem; color: var(--ink-soft); }
+.sources h3 { color: var(--ink); margin-top: 1.6rem; }
+.sources ul { margin: 0.5rem 0 0; padding-left: 1.1rem; }
+.sources li { margin-bottom: 0.5rem; }
+.sources li::marker { color: var(--rule); }
+
+.tooltip {
+  position: fixed; pointer-events: none; z-index: 20; opacity: 0;
+  background: var(--ink); color: var(--paper); padding: 0.45rem 0.7rem;
+  font-size: 0.84rem; line-height: 1.35; max-width: 17rem;
+  font-variant-numeric: tabular-nums lining-nums;
+  transition: opacity 0.1s linear;
+}
+.tooltip strong { color: var(--paper); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="site-header">
+  <div class="site-id">
+    <a class="hanko" href="index.html" aria-label="Home"><span lang="ja">慈</span><span lang="ja">恵</span><span lang="ja">努</span></a>
+    <div>
+      <p class="site-name"><a href="index.html">Jedediah Pida-Reese</a></p>
+      <p class="site-tagline">Research Assistant Professor of Economics, Creighton University</p>
+    </div>
+  </div>
+  <nav class="site-nav" aria-label="Primary">
+    <a href="index.html">Home</a>
+    <a href="research.html">Research</a>
+    <a href="teaching.html">Teaching</a>
+    <a href="cv.html">CV</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+<hr class="masthead-rule">
+
+<main>
+
+  <div class="title-block">
+    <p class="piece-mark" lang="ja" aria-hidden="true">一票</p>
+    <h1>The Pivotal Voter</h1>
+    <p class="standfirst">An economist's arithmetic for the chance that your vote is the one that decides an election, worked out on every federal and state legislative race on record.</p>
+    <p class="byline">Jedediah Pida-Reese</p>
+  </div>
+
+  <div class="prose">
+    <p>Economists have a standard argument about voting, and it runs roughly like this. Casting a ballot changes the outcome only when the election would otherwise be tied or decided by one vote. In an electorate of millions, that event is vanishingly rare. Voting costs time, and learning enough to vote well costs far more time than that. Multiply a large benefit by a minuscule probability and you get a number smaller than the cost of the trip to the polling place, so a narrowly self-interested person stays home.</p>
+    <p>The argument is old, it is taught in every public choice course, and most of the way through it is correct. What follows works the arithmetic out rather than asserting it. Every number on this page is computed from official returns: the Federal Election Commission's certified presidential results, the Clerk of the House's <cite>Statistics of the Congressional Election</cite> for every district, and the archive of state legislative returns assembled at the Massachusetts Institute of Technology. You can change the assumptions and watch the answer move.</p>
+    <p class="lede-note">The controls below are live. Nothing on this page is a stored result; each figure is recomputed in your browser from the returns it carries.</p>
+  </div>
+
+  <!-- ==================================================================== -->
+  <section id="guess">
+    <div class="section-head">
+      <p class="eyebrow">I &nbsp;·&nbsp; A question before the arithmetic</p>
+      <h2>How often has one vote actually decided a seat in Congress?</h2>
+    </div>
+
+    <div class="prose">
+      <p>Since 1976 there have been 10,220 contested general elections for the United States House of Representatives. Before reading further, write down how many of them were decided by exactly one vote.</p>
+    </div>
+
+    <div class="guess">
+      <p><label for="guessInput">Of 10,220 contested House elections since 1976, the number decided by a single vote:</label></p>
+      <div class="guess-row">
+        <input type="number" id="guessInput" min="0" max="10220" step="1" inputmode="numeric" placeholder="your guess">
+        <button id="guessBtn" type="button">Show the answer</button>
+      </div>
+      <div class="guess-answer" id="guessAnswer" hidden>
+        <p><strong>None.</strong> <span id="guessReaction"></span> Two were decided by ten votes or fewer: Indiana's 8th district in 1984, by four votes out of 234,092, and Iowa's 2nd district in 2020, by six votes out of 413,989. Eight were decided by a hundred votes or fewer. Across half a century of national elections, the closest any House seat has come to a genuine tie is four votes.</p>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>That result is the argument's strongest evidence, and it is also where the argument starts to get interesting. The same calculation run on state legislatures gives a different answer. In 82,590 contested general elections for state house and state senate seats between 1967 and 2016, eleven ended in an exact tie and twenty-six were decided by one vote or fewer. That is one race in roughly every 3,200. The median race drew 16,390 voters.</p>
+      <p>Nothing about a voter changes between those two settings. What changes is the size of the electorate, and the whole question turns out to be a question about size.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="calculus">
+    <div class="section-head">
+      <p class="eyebrow">II &nbsp;·&nbsp; The calculus of voting</p>
+      <h2>What the model actually says</h2>
+    </div>
+
+    <div class="prose">
+      <p>Anthony Downs set the problem out in 1957, and William Riker and Peter Ordeshook gave it the notation that stuck. A person votes when the return exceeds zero:</p>
+    </div>
+
+    <p class="formula">
+      <em>R</em> = <em>P</em> · <em>B</em> − <em>C</em> + <em>D</em>
+      <span class="gloss">P, the chance your vote decides the outcome &nbsp;·&nbsp; B, what deciding it is worth to you &nbsp;·&nbsp; C, what voting costs you &nbsp;·&nbsp; D, everything else you get from voting</span>
+    </p>
+
+    <div class="prose">
+      <p>The paradox is usually laid at Downs's door, and he does not belong there. His own account of the decision includes what he called a long-run participation value, which a citizen receives because he wants democracy to survive, and he concluded that people vote. The sharp version of the argument comes from Gordon Tullock and the generation that followed him.</p>
+      <p>Three of those four terms are ordinary. You can put a dollar figure on <em>B</em> by asking what you would pay to install your preferred candidate. You can measure <em>C</em> with a clock and a wage. <em>D</em> collects the satisfactions that do not depend on the result at all, and it is the term that does most of the work in explaining why people actually vote; it is also the term the standard argument sets aside.</p>
+      <p><em>P</em> is the hard one. It is not measured, it is modelled, and the two models economists have used give answers that differ by eighty-seven orders of magnitude for the same election. The rest of this page is about <em>P</em>.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="coinflip">
+    <div class="section-head">
+      <p class="eyebrow">III &nbsp;·&nbsp; The first model</p>
+      <h2>Every voter flips a coin</h2>
+    </div>
+
+    <div class="prose">
+      <p>The textbook derivation treats each of the other <em>n</em> voters as an independent draw: each one favours candidate A with the same known probability <em>p</em>. Your vote decides the election when those <em>n</em> voters split evenly. That probability has a closed form, and when <em>p</em> is exactly one half it simplifies to the square root of 2 divided by π<em>n</em> — a number that falls only as fast as the square root of the electorate.</p>
+      <p>Move <em>p</em> a hair off one half and the model behaves very differently. Try it.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Instrument 1 &nbsp;·&nbsp; The coin-flip model</p>
+        <p class="panel-lead">One million other voters, each independently favouring candidate A with probability <em>p</em>. The vertical scale is logarithmic, and it has to be.</p>
+      </div>
+      <div class="controls two">
+        <div class="ctrl">
+          <label for="cfP">Probability each voter favours A <span class="val" id="cfPVal">0.500</span></label>
+          <input type="range" id="cfP" min="480" max="520" step="1" value="500">
+        </div>
+        <div class="ctrl">
+          <label for="cfN">Other voters <span class="val" id="cfNVal">1,000,000</span></label>
+          <input type="range" id="cfN" min="3" max="8" step="0.05" value="6">
+        </div>
+      </div>
+      <div class="figwrap"><figure>
+        <svg id="cfChart" viewBox="0 0 720 300" role="img" aria-labelledby="cfTitle"><title id="cfTitle">Probability that one vote is decisive, against the probability each voter favours candidate A</title></svg>
+        <figcaption id="cfCaption"></figcaption>
+      </figure></div>
+      <div class="readout three">
+        <div class="stat">
+          <p class="stat-label">Chance your vote decides</p>
+          <p class="stat-value accent" id="cfOdds">1 in 1,253</p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Expected margin</p>
+          <p class="stat-value" id="cfMargin">0 votes</p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Same odds as</p>
+          <p class="stat-value" id="cfCompare" style="font-size:1.05rem;line-height:1.35"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>At <em>p</em> = 0.500 the model says one in 1,253. At <em>p</em> = 0.510, with the same million voters, it says one in 9.4 × 10<sup>89</sup>. There are roughly 10<sup>80</sup> atoms in the observable universe. A one-percentage-point shift in an unmeasurable parameter moved the answer by eighty-seven orders of magnitude, which means the model cannot be used for anything. No poll, and no forecast, resolves <em>p</em> to the precision this model demands.</p>
+      <p>The failure is not a technicality. Andrew Gelman, Jonathan Katz and Joseph Bafumi showed that voting-power indices built on this independent-coin assumption disagree badly with what actually happens in elections, and Gary Chamberlain and Michael Rothschild had already identified the reason: the uncertainty that matters is not uncertainty about how each voter will flip, but uncertainty about where the whole electorate will land.</p>
+      <p>Two further assumptions travel with the coin model without being stated. It treats the number of other voters as fixed, when that number is the sum of the very decisions the argument is telling people to make. Downs saw the difficulty and called it a maze of conjectural variation: if everyone else votes, one ballot is not worth casting, and if everyone reasons that way and stays home, it is worth casting after all. The model also assumes that a voter maximizes expected value. John Ferejohn and Morris Fiorina showed that a voter with identical beliefs who instead minimizes his maximum regret votes whenever the cost falls below a quarter of what the outcome is worth to him, a rule in which the size of the electorate does not appear at all.</p>
+    </div>
+
+    <details class="math">
+      <summary>The closed form</summary>
+      <p>With <em>n</em> other voters, each independently favouring A with probability <em>p</em>, an even split has probability C(<em>n</em>, <em>n</em>/2) <em>p</em><sup><em>n</em>/2</sup>(1−<em>p</em>)<sup><em>n</em>/2</sup> when <em>n</em> is even. When <em>n</em> is odd your vote creates a tie rather than breaking one, and the tie is then resolved by rule or by lot, so the two nearest splits each count half. Stirling's approximation at <em>p</em> = 1/2 gives √(2/π<em>n</em>). Away from one half, the normal approximation multiplies that by exp(−<em>n</em>(<em>p</em>−1/2)²/(2<em>p</em>(1−<em>p</em>))), and the exponential is what destroys the answer.</p>
+    </details>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="uncertainty">
+    <div class="section-head">
+      <p class="eyebrow">IV &nbsp;·&nbsp; The second model</p>
+      <h2>The forecast is uncertain, not the voters</h2>
+    </div>
+
+    <div class="prose">
+      <p>Replace the coins with a forecast. Before an election, nobody knows the share of the vote candidate A will receive; the best anyone has is a distribution over possible shares, centred near the polling average and spread by however wrong that average can be. Write <em>f</em> for the density of that distribution. Then the chance the final count lands exactly on a tie is the height of the forecast at one half, divided by the number of voters:</p>
+    </div>
+
+    <p class="formula">
+      <em>P</em> ≈ <em>f</em>(½) ⁄ <em>n</em>
+      <span class="gloss">and if the forecast is a normal distribution centred on μ with standard deviation σ, that is φ((½ − μ)/σ) ⁄ (<em>n</em>σ)</span>
+    </p>
+
+    <div class="prose">
+      <p>Two things follow immediately. The probability now falls in proportion to the electorate rather than to its square root, so large elections are worse for the individual voter than the coin model suggested. And the probability no longer collapses to nothing the moment the race is not a perfect tie, because a forecast centred two points off one half still puts real weight on a tie.</p>
+      <p>σ is the width of the forecast, not the width of a poll's margin of error. A poll of two thousand people has a sampling error near one point, but polls also miss systematically, by amounts that historically run to three or four points in a presidential year. Set σ by how wrong the whole forecasting apparatus can be, not by the sample size.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Instrument 2 &nbsp;·&nbsp; The forecast model</p>
+        <p class="panel-lead">Set the electorate, where the forecast is centred, and how wrong the forecast can be. The curve shows the chance one vote decides the race across every possible forecast centre; the marker sits at yours.</p>
+      </div>
+      <div class="controls three">
+        <div class="ctrl">
+          <label for="fmN">Voters <span class="val" id="fmNVal">6,966,350</span></label>
+          <input type="range" id="fmN" min="3" max="8.2" step="0.02" value="6.843">
+        </div>
+        <div class="ctrl">
+          <label for="fmMu">Forecast centre <span class="val" id="fmMuVal">49.1%</span></label>
+          <input type="range" id="fmMu" min="400" max="600" step="1" value="491">
+        </div>
+        <div class="ctrl">
+          <label for="fmSd">Forecast error, σ <span class="val" id="fmSdVal">4.0 pts</span></label>
+          <input type="range" id="fmSd" min="5" max="100" step="1" value="40">
+        </div>
+      </div>
+      <div class="figwrap"><figure>
+        <svg id="fmChart" viewBox="0 0 720 320" role="img" aria-labelledby="fmTitle"><title id="fmTitle">Chance one vote decides the race, against where the forecast is centred</title></svg>
+        <figcaption id="fmCaption"></figcaption>
+      </figure></div>
+      <div class="readout three">
+        <div class="stat">
+          <p class="stat-label">Chance your vote decides</p>
+          <p class="stat-value accent" id="fmOdds"></p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Coin-flip model, same inputs</p>
+          <p class="stat-value" id="fmCoin" style="font-size:1.15rem"></p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Ratio between the two</p>
+          <p class="stat-value" id="fmRatio" style="font-size:1.15rem"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>The default setting is Pennsylvania in 2024: 6,966,350 people voted for one of the two major-party candidates, and the Democratic share of that two-party vote was 49.1 percent. With a forecast error of four points, one vote there carried about a one in seven hundred thousand chance of determining which candidate carried Pennsylvania. The coin-flip model, handed the same inputs, returns a number with hundreds of zeros after the decimal point.</p>
+      <p>Carrying Pennsylvania is not the same as winning the presidency, and the gap between those two events is the subject of the next section.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="states">
+    <div class="section-head">
+      <p class="eyebrow">V &nbsp;·&nbsp; Fifty states and one electoral college</p>
+      <h2>Your vote has to matter twice</h2>
+    </div>
+
+    <div class="prose">
+      <p>A presidential vote is not counted into a national total. It is counted into a state, the state awards its electors as a block, and the electors are counted toward 270. So one vote decides the presidency only when two things happen together: the voter's own state finishes exactly tied, and that state's electors are the ones that carry the winner past 270.</p>
+      <p>Those two events are not independent, and treating them as independent gets the answer wrong. A state finishing in a dead heat is itself evidence about the national environment, and the national environment determines whether that state's electors decide anything. The calculation below handles this the way Andrew Gelman, Nate Silver and Aaron Edlin did: it simulates the whole map from a common national swing plus a state-specific shock, and it evaluates each state's decisiveness conditional on that state being tied.</p>
+      <p>It runs on the certified 2024 returns — all 155,238,302 votes — and on whatever forecast error you set.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Instrument 3 &nbsp;·&nbsp; A presidential vote, state by state</p>
+        <p class="panel-lead">Twenty thousand simulated elections, redrawn whenever you move a control. The national swing shifts every state together; the state shock moves each one on its own.</p>
+      </div>
+      <div class="controls three">
+        <div class="ctrl">
+          <label for="ecState">Your state</label>
+          <select id="ecState"></select>
+        </div>
+        <div class="ctrl">
+          <label for="ecNat">National forecast error <span class="val" id="ecNatVal">4.0 pts</span></label>
+          <input type="range" id="ecNat" min="10" max="80" step="1" value="40">
+        </div>
+        <div class="ctrl">
+          <label for="ecSt">State-specific error <span class="val" id="ecStVal">2.0 pts</span></label>
+          <input type="range" id="ecSt" min="5" max="50" step="1" value="20">
+        </div>
+      </div>
+
+      <div class="readout three">
+        <div class="stat">
+          <p class="stat-label">Your state finishes tied</p>
+          <p class="stat-value" id="ecTie" style="font-size:1.25rem"></p>
+          <p class="stat-note" id="ecTieNote"></p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Its electors then decide</p>
+          <p class="stat-value" id="ecDec" style="font-size:1.25rem"></p>
+          <p class="stat-note">Given that the state is tied.</p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Your vote decides the presidency</p>
+          <p class="stat-value accent" id="ecTotal" style="font-size:1.25rem"></p>
+          <p class="stat-note" id="ecRank"></p>
+        </div>
+      </div>
+
+      <div class="figwrap" style="margin-top:1.6rem"><figure>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--series-a)"></span>Every state, 2024 returns</span>
+          <span><span class="swatch" style="background:var(--series-b)"></span>Your state</span>
+        </div>
+        <svg id="ecChart" viewBox="0 0 720 460" role="img" aria-labelledby="ecTitle"><title id="ecTitle">Chance one vote decides the presidency, by state</title></svg>
+        <figcaption>Horizontal scale is logarithmic. A voter in the most closely balanced state carries hundreds of times the weight of a voter in a state whose result is not in doubt, and no amount of turnout changes that ordering.</figcaption>
+      </figure></div>
+    </div>
+
+    <div class="prose">
+      <p>Two features of the result matter more than the headline number. The spread across states runs to several orders of magnitude, so where a person lives affects the instrumental value of their vote far more than anything they can control. And raising the forecast error compresses that spread: when nobody knows what will happen, more states have a plausible path to deciding the election, and the safe states stop being quite so safe.</p>
+      <p>Gelman, Silver and Edlin ran this calculation on the 2008 election and reported an average near one chance in sixty million, with the best-placed voters — in New Mexico, Virginia, New Hampshire and Colorado — at roughly one in ten million. The numbers here are larger because the 2024 map was tighter than the 2008 map, and because a forecast made on election eve is narrower than one made a year out. The structure of the answer is the same.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="ladder">
+    <div class="section-head">
+      <p class="eyebrow">VI &nbsp;·&nbsp; The ladder</p>
+      <h2>From the school board to the presidency</h2>
+    </div>
+
+    <div class="prose">
+      <p>The presidency is the worst case. Nearly every other office a person votes for is decided by a far smaller electorate, and the probability moves in proportion. The table below gives the median number of votes actually cast at each level, computed from the returns rather than from turnout estimates, together with what the forecast model implies for a competitive race of that size.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Instrument 4 &nbsp;·&nbsp; Election size against decisiveness</p>
+        <p class="panel-lead">Each level is placed at the median number of votes cast in a contested race for that office. The line is the forecast model for a race believed to be close; the points are what the historical record shows.</p>
+      </div>
+      <div class="controls two">
+        <div class="ctrl">
+          <label for="ladSd">Forecast error, σ <span class="val" id="ladSdVal">4.0 pts</span></label>
+          <input type="range" id="ladSd" min="10" max="100" step="1" value="40">
+        </div>
+        <div class="ctrl">
+          <label for="ladMu">How close the race is expected to be <span class="val" id="ladMuVal">dead heat</span></label>
+          <input type="range" id="ladMu" min="500" max="560" step="1" value="500">
+        </div>
+      </div>
+      <div class="figwrap"><figure>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--series-a)"></span>The forecast model</span>
+          <span><span class="swatch" style="background:var(--series-b)"></span>Median race at each level</span>
+          <span><span class="swatch" style="background:transparent;border:1.5px solid var(--ink-soft)"></span>Observed near-tie frequency</span>
+          <span><span class="swatch" style="background:linear-gradient(90deg,var(--ink-faint) 55%,transparent 55%)"></span>Coin-flip model, at a perfect tie</span>
+        </div>
+        <svg id="ladChart" viewBox="0 0 720 380" role="img" aria-labelledby="ladTitle"><title id="ladTitle">Chance one vote is decisive against the number of votes cast</title></svg>
+        <figcaption>Both scales are logarithmic, so a constant slope is a constant elasticity. The dashed line is the coin-flip model at the only setting where it is generous, a perfect dead heat, where it falls as the square root of the electorate: slope &minus;&frac12;. The solid line is the forecast model, which falls in proportion to the electorate: slope &minus;1. The open squares are not model output at all &mdash; they are the observed frequency of near-ties in 82,590 state legislative races, grouped into six bands by size, and they fall along a slope of &minus;0.79. The data pick the solid line.</figcaption>
+      </figure></div>
+      <div class="table-wrap">
+        <table id="ladTable">
+          <caption>Median votes cast in a contested general election, and what the model implies</caption>
+          <thead><tr>
+            <th>Office</th><th class="num">Median votes cast</th><th class="num">Races counted</th>
+            <th class="num">Chance one vote decides</th><th>Closest result on record</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>A state house seat draws about one voter in every 11,500 that a presidential election draws, and the chance that a single vote decides it is larger by roughly that factor.</p>
+      <p>The open squares test the model rather than illustrate it. Group all 82,590 contested state legislative races by the size of the electorate, count how often the margin came within ten votes, and the frequency falls along a line: each doubling of the electorate roughly halves it. Casey Mulligan and Charles Hunter found the same relationship on a different sample and put the slope at exactly &minus;1; on this sample the fitted slope is &minus;0.79. Either figure is the signature of the forecast model.</p>
+      <p>The dashed line is worth a moment, because a version of it circulates widely. Voting power is often said to scale with the square root of the population, and inside the coin-flip model that is exactly right: at a perfect dead heat the probability is the square root of 2 divided by &pi;<em>n</em>, which gives the dashed slope of one half. The claim is true of a model whose voters are independent, symmetric and wholly unforecastable. Real electorates are none of those things, and the observed slope is twice as steep as the square-root law predicts.</p>
+      <p>Local offices sit below the bottom row of that table, and the systematic returns to place them there do not exist. What is documented is the turnout. The Portland State University survey of the thirty largest American cities found mayoral elections drawing 6.1 percent of eligible citizens in Dallas, 6.5 percent in Fort Worth and 9.4 percent in Las Vegas, with ten of the thirty cities under 15 percent and a median voter age of 57. In April 2020 the Racine Unified School District in Wisconsin approved a billion dollars of additional revenue over thirty years by 16,715 votes to 16,711. Four votes moved a billion dollars, and turnout was a third of what a presidential year brings.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="primaries">
+    <div class="section-head">
+      <p class="eyebrow">VII &nbsp;·&nbsp; Stages</p>
+      <h2>The election most voters skip is the one that picks the winner</h2>
+    </div>
+
+    <div class="prose">
+      <p>Choosing a representative takes two elections, and almost everything written about the value of a vote concerns the second one. In 2020, 56,026,380 ballots were cast in the presidential primaries against 158,429,631 in the general election. The nominating electorate was about a third the size of the deciding electorate, which by itself makes each primary vote roughly three times as likely to be decisive.</p>
+      <p>Congressional primaries make the point far more sharply, because in most districts the general election settles nothing. In 2020, 264 of the 435 House seats were either uncontested by the other major party or won by more than twenty points. In those seats the winner was chosen in a primary that drew a median of 85,379 votes, and then confirmed in a general election that drew a median of 362,552.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Instrument 5 &nbsp;·&nbsp; Two stages of one election</p>
+        <p class="panel-lead">Median votes cast in a US House primary and in the general election that followed, with the seats where the general election was not competitive shown separately.</p>
+      </div>
+      <div class="controls two">
+        <div class="ctrl">
+          <label for="primYear">Cycle</label>
+          <select id="primYear">
+            <option value="2020">2020</option>
+            <option value="2022" selected>2022</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="primSd">Forecast error, σ <span class="val" id="primSdVal">4.0 pts</span></label>
+          <input type="range" id="primSd" min="10" max="100" step="1" value="40">
+        </div>
+      </div>
+      <div class="figwrap"><figure>
+        <svg id="primChart" viewBox="0 0 720 260" role="img" aria-labelledby="primTitle"><title id="primTitle">Median votes cast in House primaries and general elections</title></svg>
+        <figcaption id="primCaption"></figcaption>
+      </figure></div>
+      <div class="readout three">
+        <div class="stat">
+          <p class="stat-label">One vote decides the primary</p>
+          <p class="stat-value accent" id="primP" style="font-size:1.25rem"></p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">One vote decides the general</p>
+          <p class="stat-value" id="primG" style="font-size:1.25rem"></p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Seats settled before the general</p>
+          <p class="stat-value" id="primSafe" style="font-size:1.25rem"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>The primary figure overstates what a primary vote buys. Deciding a primary changes who holds the seat only to the extent that the two candidates would govern differently, and in a safe seat the two primary candidates usually belong to the same party. The chain runs: the chance your vote decides the primary, multiplied by the chance that the two possible nominees would have produced different outcomes in office. The first factor is larger than in the general election and the second is smaller, and the research does not settle how much smaller.</p>
+      <p>Delegate rules add a further complication in presidential nominating contests. The Democratic Party awards delegates proportionally among candidates who clear fifteen percent of the vote in a district or statewide, so a vote there can be decisive for a single delegate without being decisive for the nomination. Most Republican contests in recent cycles have used winner-take-all or winner-take-most rules, where the threshold effect is coarser and the pivot correspondingly rarer.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="record">
+    <div class="section-head">
+      <p class="eyebrow">VIII &nbsp;·&nbsp; The record</p>
+      <h2>What has actually happened</h2>
+    </div>
+
+    <div class="prose">
+      <p>A model of rare events should be checked against the frequency of the events. Casey Mulligan and Charles Hunter did that first, on 16,577 contested US House elections between 1898 and 1992 and 40,036 state legislative elections between 1968 and 1989. Exactly one House race in that century was decided by a single vote: New York's 36th district in 1910, certified 20,685 to 20,684, and a later recount that found an arithmetic error made it 20,690 to 20,684 instead. Among the state legislative races, two tied and seven were decided by one vote. Weighting by ballots rather than by contests, they concluded that one vote in every 100,000 cast in congressional elections, and one in every 15,000 cast in state legislative elections, went to a candidate who officially tied or won by one. Their other finding matters as much: very close elections turn out to be rarer than the independent-coin model predicts, not more common.</p>
+      <p>The record since then is below, computed here from the returns.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Instrument 6 &nbsp;·&nbsp; Margins of victory</p>
+        <p class="panel-lead">Every contested general election on record at the chosen level, sorted by how close it was. The scale is logarithmic in the margin, so the closest races appear at the left.</p>
+      </div>
+      <div class="controls two">
+        <div class="ctrl">
+          <label for="recLevel">Level</label>
+          <select id="recLevel">
+            <option value="house">US House, 1976&ndash;2024</option>
+            <option value="senate">US Senate, 1976&ndash;2024</option>
+            <option value="sler">State legislatures, 1967&ndash;2016</option>
+          </select>
+        </div>
+      </div>
+      <div class="readout three" id="recStats"></div>
+      <div class="table-wrap">
+        <table id="recTable">
+          <caption id="recCaption"></caption>
+          <thead><tr><th>Race</th><th class="num">Margin</th><th class="num">Votes cast</th><th class="num">Margin as a share</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Presidential elections have their own version of the question, and it has two answers. Ranking the winner's states from the largest margin down and walking the electoral votes to 270 identifies the state that delivered the win. Flipping that one state, though, usually leaves the winner still ahead, so a second calculation asks what the cheapest change would actually have been: which set of states the runner-up would have had to take, and how few voters would have had to switch sides to deliver them. Switching one voter moves a margin by two, so a state carried by 537 votes needs 269 switchers rather than 537.</p>
+      <p>Both answers appear below for every election since 1976. In 2016 the presidency turned on 38,875 people spread across three states, out of more than 136 million voters.</p>
+    </div>
+
+    <div class="table-wrap" style="max-width:52rem;margin-left:auto;margin-right:auto">
+      <table id="tipTable">
+        <caption>Deciding states and the cheapest possible change, 1976&ndash;2024</caption>
+        <thead><tr>
+          <th>Year</th><th class="num">Result</th><th>State that crossed 270</th>
+          <th class="num">Its margin</th><th>Cheapest set to flip</th>
+          <th class="num">Switchers</th><th class="num">Share of all votes</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>Florida in 2000 is the case the argument always reaches for. George W. Bush carried the state by 537 votes out of 5,963,110, and those 537 votes carried the presidency. Even so, no individual voter was decisive: 537 is not one, and a single additional Gore voter would have changed the certified margin to 536 and nothing else. The closest presidential election in modern American history still needed 269 people to change their minds, which is 269 times as many as any one voter controls.</p>
+      <p>Rules rather than voters close the gap between a close election and a decisive vote. Virginia's 94th House of Delegates district in 2017 shows how. A recount put Shelly Simonds ahead by one vote; a three-judge panel then counted a disputed ballot for David Yancey, making it 11,608 apiece; and on 4 January 2018 the winner was drawn from a bowl, in a film canister. Control of the chamber turned on the draw, which gave Republicans 51 seats instead of a 50-50 split. No voter decided that election. A judge and a bowl did.</p>
+      <p>The same pattern shows in the aggregate. Of 6,929 statewide general elections between 2000 and 2023, thirty-six went to a recount and three of those reversed the leader, every one from an initial margin under 0.06 percent. Mulligan and Hunter checked the newspaper record for each of the ties and one-vote margins in their own sample and found that substituting the later counts for the official ones cut the measured frequency of pivotal votes by half. The closest federal outcome ever recorded ended without a winner at all: in New Hampshire in 1974, the count went from Louis Wyman by 355 on election night to John Durkin by 10 after the recount to Wyman by 2 after the ballot commission, at which point the Senate deadlocked, declared the seat vacant, and sent the question back to the state for a fresh election. Durkin won that one by more than 27,000.</p>
+    </div>
+  </section>
+  <!-- ==================================================================== -->
+  <section id="cost">
+    <div class="section-head">
+      <p class="eyebrow">IX &nbsp;·&nbsp; The other side of the ledger</p>
+      <h2>What voting costs</h2>
+    </div>
+
+    <div class="prose">
+      <p>Everything so far concerns <em>P</em>. The argument needs <em>C</em> as well, and the measured cost is smaller than the version usually quoted.</p>
+      <p>Charles Stewart and Stephen Ansolabehere measured the 2012 election through the Cooperative Congressional Election Study and found an average wait of 13.3 minutes. More than a third of voters, 37.3 percent, waited not at all. A study that tracked about 150,000 smartphones across more than 40,000 polling places in 2016 found a median of 14 minutes and a mean of 19. In 2024 the Survey of the Performance of American Elections found 11 percent of Election Day voters waiting longer than half an hour. At the median American hourly wage of $24.51, a fourteen-minute wait costs about six dollars.</p>
+      <p>The average conceals a badly skewed tail. In 2012 the 3.9 percent of voters who waited more than an hour averaged 110 minutes and absorbed 31 percent of all the time Americans spent standing in line. Average waits ranged from 1.5 minutes in Vermont to 39.2 minutes in Florida, and within Florida from 5.7 minutes in Marion County to 136.6 in Lee. Black voters waited 23.3 minutes on average against 11.6 for white voters. For a voter at the wrong end of that distribution the cost of voting is not six dollars, and in states requiring photo identification the price of obtaining one has been put at $75 to $175 for people who lack it.</p>
+      <p>Becoming informed is the expensive part, and it is where the standard argument overreaches. Downs called the consequence rational ignorance: since the chance of being decisive is negligible, the return on studying the candidates is negligible too, so a rational voter declines to learn. Bryan Caplan's rational irrationality is a stronger and different claim, and the difference matters. Rational ignorance predicts random error, which cancels out across millions of voters. Rational irrationality predicts systematic bias, because a voter who pays no material price for holding a false belief may hold whichever belief he enjoys, and enjoyable errors do not cancel.</p>
+      <p>The overreach lies in charging the whole cost of political information to the act of voting. A person who follows an election because the outcome interests them, or because their friends discuss it, or because they enjoy the argument, has already paid that cost for other reasons. What the vote costs on the margin is the trip, not the education.</p>
+      <p>A second accounting error runs the same way. One trip, one registration and one stock of information buy a vote in every contest on the ballot, and an American ballot in a general election carries federal, state, county and municipal races at once, along with judges and referenda. The standard comparison assigns the whole cost to a single contest and then measures it against the smallest probability on the paper. Divide the cost across the contests and measure it against the largest probability instead, and the arithmetic moves by three or four orders of magnitude.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <p class="panel-title">Instrument 7 &nbsp;·&nbsp; The expected-value calculation</p>
+        <p class="panel-lead">Set what the outcome is worth and what the trip costs you. The last control is the one that decides the argument, and it starts at zero.</p>
+      </div>
+      <div class="controls three">
+        <div class="ctrl">
+          <label for="evRace">Election</label>
+          <select id="evRace"></select>
+        </div>
+        <div class="ctrl">
+          <label for="evB">Value of the better outcome, per person <span class="val" id="evBVal">$10,000</span></label>
+          <input type="range" id="evB" min="2" max="6" step="0.05" value="4">
+        </div>
+        <div class="ctrl">
+          <label for="evC">Time voting takes you <span class="val" id="evCVal">45 min</span></label>
+          <input type="range" id="evC" min="5" max="240" step="5" value="45">
+        </div>
+      </div>
+      <div class="controls two">
+        <div class="ctrl">
+          <label for="evWage">Value of your time, per hour <span class="val" id="evWageVal">$25</span></label>
+          <input type="range" id="evWage" min="10" max="200" step="1" value="25">
+        </div>
+        <div class="ctrl">
+          <label for="evAlt">Weight you place on a stranger's welfare <span class="val" id="evAltVal">none</span></label>
+          <input type="range" id="evAlt" min="0" max="100" step="1" value="0">
+        </div>
+      </div>
+      <div class="readout three">
+        <div class="stat">
+          <p class="stat-label">Expected benefit</p>
+          <p class="stat-value" id="evBenefit" style="font-size:1.35rem"></p>
+          <p class="stat-note" id="evBenefitNote"></p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Cost</p>
+          <p class="stat-value" id="evCost" style="font-size:1.35rem"></p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Verdict</p>
+          <p class="stat-value accent" id="evVerdict" style="font-size:1.35rem"></p>
+          <p class="stat-note" id="evVerdictNote"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Leave the last control at zero and the verdict is the familiar one. In a presidential election the expected benefit is a fraction of a cent against a cost of tens of dollars, and no plausible adjustment to the value of the outcome rescues it. Setting that value at a million dollars still leaves a presidential vote worth a few cents. Aaron Edlin, Andrew Gelman and Noah Kaplan report the same benchmark: with a million voters and an outcome worth $10,000 to the voter, the expected gain from possibly swinging the election comes to less than ten cents.</p>
+      <p>That verdict holds only for a voter who counts nobody but himself.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="resolutions">
+    <div class="section-head">
+      <p class="eyebrow">X &nbsp;·&nbsp; Why the conclusion does not follow</p>
+      <h2>Three answers economists give</h2>
+    </div>
+
+    <div class="prose">
+      <p>The arithmetic above is not in dispute. What it establishes is disputed, and there are three serious answers, none of which requires abandoning the model.</p>
+
+      <h3>The electorate cancels out</h3>
+      <p>Edlin, Gelman and Kaplan supply the algebra. Suppose a voter values the outcome partly for himself and partly for everyone else, weighting each other person's welfare at some rate α. Then the benefit of the better candidate winning is his own stake plus α times the number of people affected times what the outcome is worth to each of them. The pivot probability, meanwhile, is a constant divided by the number of voters. Multiply the two and the electorate appears once in the numerator and once in the denominator.</p>
+      <p>What survives is the ratio of people affected to people voting, which is roughly two or three and does not shrink as the country grows. Their worked case puts the social benefit at ten dollars a head and assumes one resident in three votes, and the expected social value of one vote comes to about $250. Discounting other people's welfare by a factor of ten still leaves voting worth the trip as long as it costs the voter less than $25. Run the comparison the other way and the threshold is easy to state: against the measured cost of a thirteen-minute wait, about $5.25 of time, voting pays for anyone who weights a stranger's welfare at more than about two percent of his own. A vote that is worthless as an investment is not worthless as a transfer, and the arithmetic that kills the first does not touch the second.</p>
+      <p>The step economists argue about is not the algebra. Edlin, Gelman and Kaplan describe the scaling itself as uncontroversial; what they flag as open is the behavioural claim that voters are in fact moved by other people's welfare rather than by something else.</p>
+
+      <h3>The vote is not an investment</h3>
+      <p>Geoffrey Brennan and Loren Lomasky start from the same arithmetic and draw the opposite lesson. If the instrumental return on a vote is worth less than a millionth of a penny, then instrumental reasoning cannot be what voters are doing, and a theory that says otherwise has misidentified the activity. Voting on this account resembles cheering at a match rather than buying a share: the point is the expression, and the expression is worth something whether or not it changes the score.</p>
+      <p>The consequence is uncomfortable, and Brennan and Lomasky accept it. A voter freed from any prospect of bearing the results can indulge preferences he would never act on at his own expense, which is why the same person may vote for a policy he would refuse to buy.</p>
+
+      <h3>The duty term was there all along</h3>
+      <p>Riker and Ordeshook put <em>D</em> in the equation in 1968 precisely because <em>PB</em> could not carry the observed behaviour. Critics have called that a relabelling rather than an explanation, since <em>D</em> is measured by the voting it is meant to explain. The complaint has force as a matter of method, and it does not dispose of the term. Whatever <em>D</em> contains, it is large enough to move roughly two-thirds of American adults to the polls in a presidential year, and a model whose remaining term must be that large is telling you where to look rather than what to conclude.</p>
+
+      <h3>What the arithmetic does establish</h3>
+      <p>Three claims survive all of this, and none of them is the claim that voting is irrational.</p>
+      <p>The first is that a single vote almost never changes a national outcome, and the record confirms it: in 10,220 contested House elections since 1976, none was decided by one vote. The second is that the instrumental value of a vote depends enormously on which election it is cast in. A vote in a state legislative race is worth thousands of times a presidential vote by this measure, and a vote in a primary that settles a safe seat is worth several times a vote in the general election that ratifies it. The third is that anyone who votes for instrumental reasons alone, and who cares about nobody but himself, is doing something the arithmetic cannot justify.</p>
+      <p>What the arithmetic does not establish is that voting is irrational, because the calculation that makes a presidential vote worthless to a purely self-interested voter makes it worth a few hundred dollars to a voter who counts other people at all. The economics of voting is often taught as a debunking. It works better as a lesson in how sensitive a conclusion can be to an assumption nobody stated out loud.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <section id="sources">
+    <div class="section-head">
+      <p class="eyebrow">Method</p>
+      <h2>Data, formulas, and what they assume</h2>
+    </div>
+
+    <div class="sources">
+      <h3>Where the numbers come from</h3>
+      <ul>
+        <li><strong>Presidential returns, 2024.</strong> Federal Election Commission, <cite>Official 2024 Presidential General Election Results</cite>. All 51 jurisdictions, 155,238,302 votes. Electoral votes are taken from the same file.</li>
+        <li><strong>Presidential returns, 2020.</strong> Federal Election Commission, <cite>Federal Elections 2020</cite>, Table 2.</li>
+        <li><strong>Presidential returns, 1976&ndash;2016.</strong> MIT Election Data and Science Lab, constituency returns. Fusion ballot lines in New York and Connecticut are summed to the candidate, and Minnesota's Democratic-Farmer-Labor line is counted as Democratic. Electoral votes for those years are derived from the House seats each state held under the governing apportionment, plus two, with each year's total checked against 538.</li>
+        <li><strong>US House, 1976&ndash;2018.</strong> MIT Election Data and Science Lab, district-level returns, general elections only, special elections excluded.</li>
+        <li><strong>US House, 2020, 2022 and 2024.</strong> Office of the Clerk, US House of Representatives, <cite>Statistics of the Presidential and Congressional Election</cite> for each cycle, parsed district by district. Two 2024 districts, Florida's 20th and Oklahoma's 3rd, reported no vote counts at all: each had a single candidate, and neither state tallies votes in an uncontested race.</li>
+        <li><strong>US Senate, 1976&ndash;2024.</strong> MIT Election Data and Science Lab, statewide returns.</li>
+        <li><strong>State legislatures, 1967&ndash;2016.</strong> State Legislative Election Returns, assembled by Klarner and colleagues, Harvard Dataverse. Single-member district general elections only; multi-member districts are excluded because a margin means something different there.</li>
+        <li><strong>Primaries.</strong> Federal Election Commission, <cite>Federal Elections 2020</cite> and <cite>Federal Elections 2022</cite>. Presidential primary totals are the Commission's own published party summary. House primary turnout is the vote cast in the winning party's primary in that district.</li>
+        <li><strong>Waiting times and the cost of voting.</strong> Stewart and Ansolabehere for the Election Assistance Commission on the 2012 study; Chen, Haggag, Pope and Rohla for the 2016 smartphone measurements; the MIT Election Data and Science Lab's <cite>How We Voted in 2024</cite> for the most recent survey; Pettigrew (2017) in <cite>Political Science Quarterly</cite> on the racial gap; Sobel (2014) on the price of obtaining photo identification; the Bureau of Labor Statistics Occupational Employment and Wage Statistics, May 2025, for the $24.51 median hourly wage; and the Census Bureau's <cite>Voting and Registration</cite> report for reasons given for not voting.</li>
+      </ul>
+
+      <h3>What the model assumes</h3>
+      <ul>
+        <li><strong>What counts as decisive.</strong> This page reports the probability that the other voters finish exactly tied, so that one more vote settles the result. Some authors, Edlin, Gelman and Kaplan among them, count the case where a vote creates a tie that is then broken by lot as half a decision, which halves their figure relative to this one. The convention is stated rather than argued; comparisons between sources should account for it.</li>
+        <li><strong>The forecast model</strong> treats the vote share as a continuous quantity with a smooth density near one half. The approximation fails for electorates of a few hundred, where the discreteness of votes matters and the exact combinatorial calculation belongs instead.</li>
+        <li><strong>The electoral college simulation</strong> moves every state by a common national swing and then by an independent state-specific shock. Real state-level errors are correlated in ways this misses, since demographically similar states move together, and correlated errors concentrate decisiveness in fewer states than shown here. Maine and Nebraska award some electors by congressional district; the simulation treats both as winner-take-all.</li>
+        <li><strong>A tie is not a decisive vote.</strong> Recounts, litigation and statutory tie-breaking rules stand between a tied count and an outcome. Of 6,929 statewide general elections between 2000 and 2023, 36 went to a recount and three reversals followed, each from an initial margin under 0.06 percent. Mulligan and Hunter found that substituting post-recount counts for official ones cut the measured frequency of pivotal votes by half.</li>
+        <li><strong>Certified totals differ slightly between compilations.</strong> State certificates and the Federal Election Commission's published tables disagree by small amounts in some states. Every figure here follows the source named for it, and no figure combines two sources for the same race.</li>
+        <li><strong>Near-tie frequencies are counts of certified margins,</strong> not counts of pivotal events. They are the right check on the model's order of magnitude and the wrong thing to call a probability.</li>
+      </ul>
+
+      <h3>The published research</h3>
+      <ul id="bibliography"></ul>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script id="voteData" type="application/json">{"pres2024":[{"ab":"AK","name":"Alaska","ev":3,"n":324484,"total":338177,"base":0.43153,"margin":44432,"mp":13.1387},{"ab":"AL","name":"Alabama","ev":9,"n":2235028,"total":2265090,"base":0.34559,"margin":690204,"mp":30.4714},{"ab":"AR","name":"Arkansas","ev":6,"n":1156146,"total":1182676,"base":0.3433,"margin":362336,"mp":30.637},{"ab":"AZ","name":"Arizona","ev":11,"n":3353102,"total":3390161,"base":0.47206,"margin":187382,"mp":5.5272},{"ab":"CA","name":"California","ev":54,"n":15357876,"total":15865475,"base":0.604,"margin":3194482,"mp":20.1348},{"ab":"CO","name":"Colorado","ev":10,"n":3105600,"total":3192745,"base":0.55647,"margin":350718,"mp":10.9848},{"ab":"CT","name":"Connecticut","ev":7,"n":1728971,"total":1759010,"base":0.57378,"margin":255135,"mp":14.5045},{"ab":"DC","name":"District of Columbia","ev":3,"n":315261,"total":325869,"base":0.93315,"margin":273109,"mp":83.8094},{"ab":"DE","name":"Delaware","ev":3,"n":504109,"total":512912,"base":0.57479,"margin":75407,"mp":14.7017},{"ab":"FL","name":"Florida","ev":30,"n":10793163,"total":10893752,"base":0.43389,"margin":1427087,"mp":13.1001},{"ab":"GA","name":"Georgia","ev":16,"n":5211134,"total":5250905,"base":0.48896,"margin":115100,"mp":2.192},{"ab":"HI","name":"Hawaii","ev":4,"n":506705,"total":516701,"base":0.6178,"margin":119383,"mp":23.1049},{"ab":"IA","name":"Iowa","ev":6,"n":1634297,"total":1663506,"base":0.43277,"margin":219741,"mp":13.2095},{"ab":"ID","name":"Idaho","ev":4,"n":880218,"total":905057,"base":0.31239,"margin":330274,"mp":36.4921},{"ab":"IL","name":"Illinois","ev":19,"n":5511942,"total":5633310,"base":0.55568,"margin":613784,"mp":10.8956},{"ab":"IN","name":"Indiana","ev":11,"n":2883950,"total":2936677,"base":0.40348,"margin":556744,"mp":18.9583},{"ab":"KS","name":"Kansas","ev":6,"n":1303655,"total":1327591,"base":0.41794,"margin":213949,"mp":16.1156},{"ab":"KY","name":"Kentucky","ev":8,"n":2041537,"total":2074530,"base":0.34486,"margin":633451,"mp":30.5347},{"ab":"LA","name":"Louisiana","ev":8,"n":1975375,"total":2006975,"base":0.38821,"margin":441635,"mp":22.005},{"ab":"MA","name":"Massachusetts","ev":11,"n":3377821,"total":3473668,"base":0.62955,"margin":875215,"mp":25.1957},{"ab":"MD","name":"Maryland","ev":10,"n":2938127,"total":3038334,"base":0.64755,"margin":867027,"mp":28.5363},{"ab":"ME","name":"Maine","ev":4,"n":813629,"total":831375,"base":0.53544,"margin":57675,"mp":6.9373},{"ab":"MI","name":"Michigan","ev":15,"n":5553169,"total":5664186,"base":0.49279,"margin":80103,"mp":1.4142},{"ab":"MN","name":"Minnesota","ev":10,"n":3176011,"total":3253920,"base":0.52172,"margin":137947,"mp":4.2394},{"ab":"MO","name":"Missouri","ev":10,"n":2952585,"total":2995327,"base":0.40663,"margin":551387,"mp":18.4082},{"ab":"MS","name":"Mississippi","ev":6,"n":1214412,"total":1228008,"base":0.38427,"margin":281076,"mp":22.8888},{"ab":"MT","name":"Montana","ev":4,"n":583985,"total":602990,"base":0.39711,"margin":120173,"mp":19.9295},{"ab":"NC","name":"North Carolina","ev":16,"n":5613798,"total":5699141,"base":0.4837,"margin":183048,"mp":3.2119},{"ab":"ND","name":"North Dakota","ev":3,"n":358832,"total":368155,"base":0.31304,"margin":134178,"mp":36.4461},{"ab":"NE","name":"Nebraska","ev":5,"n":934811,"total":952182,"base":0.3958,"margin":194821,"mp":20.4605},{"ab":"NH","name":"New Hampshire","ev":4,"n":814011,"total":826189,"base":0.51411,"margin":22965,"mp":2.7796},{"ab":"NJ","name":"New Jersey","ev":14,"n":4188928,"total":4272725,"base":0.53014,"margin":252498,"mp":5.9095},{"ab":"NM","name":"New Mexico","ev":5,"n":902193,"total":923403,"base":0.53071,"margin":55411,"mp":6.0007},{"ab":"NV","name":"Nevada","ev":6,"n":1456402,"total":1484840,"base":0.4842,"margin":46008,"mp":3.0985},{"ab":"NY","name":"New York","ev":28,"n":8198094,"total":8262495,"base":0.56345,"margin":1040296,"mp":12.5906},{"ab":"OH","name":"Ohio","ev":17,"n":5713815,"total":5767788,"base":0.44343,"margin":646417,"mp":11.2074},{"ab":"OK","name":"Oklahoma","ev":7,"n":1535812,"total":1566173,"base":0.3253,"margin":536614,"mp":34.2628},{"ab":"OR","name":"Oregon","ev":8,"n":2160080,"total":2244493,"base":0.57433,"margin":321120,"mp":14.307},{"ab":"PA","name":"Pennsylvania","ev":19,"n":6966350,"total":7058732,"base":0.49137,"margin":120266,"mp":1.7038},{"ab":"RI","name":"Rhode Island","ev":4,"n":499562,"total":513386,"base":0.57081,"margin":70750,"mp":13.7811},{"ab":"SC","name":"South Carolina","ev":9,"n":2512199,"total":2548140,"base":0.40938,"margin":455295,"mp":17.8677},{"ab":"SD","name":"South Dakota","ev":3,"n":418940,"total":428922,"base":0.35055,"margin":125222,"mp":29.1946},{"ab":"TN","name":"Tennessee","ev":11,"n":3023130,"total":3063942,"base":0.34939,"margin":910600,"mp":29.7199},{"ab":"TX","name":"Texas","ev":40,"n":11228847,"total":11388674,"base":0.43061,"margin":1558347,"mp":13.6833},{"ab":"UT","name":"Utah","ev":6,"n":1446384,"total":1488494,"base":0.38895,"margin":321252,"mp":21.5824},{"ab":"VA","name":"Virginia","ev":13,"n":4407875,"total":4503288,"base":0.52946,"margin":259681,"mp":5.7665},{"ab":"VT","name":"Vermont","ev":3,"n":355186,"total":369422,"base":0.66385,"margin":116396,"mp":31.5076},{"ab":"WA","name":"Washington","ev":12,"n":3776772,"total":3924243,"base":0.59465,"margin":714926,"mp":18.2182},{"ab":"WI","name":"Wisconsin","ev":10,"n":3365855,"total":3422918,"base":0.49563,"margin":29397,"mp":0.8588},{"ab":"WV","name":"West Virginia","ev":4,"n":747865,"total":762582,"base":0.28656,"margin":319247,"mp":41.864},{"ab":"WY","name":"Wyoming","ev":3,"n":262160,"total":269048,"base":0.26521,"margin":123106,"mp":45.7561}],"pres2020":[{"ab":"AK","name":"Alaska","ev":3,"n":343729,"total":359530,"base":0.44738,"margin":36173,"mp":10.0612},{"ab":"AL","name":"Alabama","ev":9,"n":2290794,"total":2323282,"base":0.37089,"margin":591546,"mp":25.4617},{"ab":"AR","name":"Arkansas","ev":6,"n":1184579,"total":1219069,"base":0.35788,"margin":336715,"mp":27.6207},{"ab":"AZ","name":"Arizona","ev":11,"n":3333829,"total":3387326,"base":0.50157,"margin":10457,"mp":0.3087},{"ab":"CA","name":"California","ev":55,"n":17117157,"total":17501380,"base":0.64909,"margin":5104121,"mp":29.1641},{"ab":"CO","name":"Colorado","ev":9,"n":3168959,"total":3256980,"base":0.56938,"margin":439745,"mp":13.5016},{"ab":"CT","name":"Connecticut","ev":7,"n":1795548,"total":1823857,"base":0.60195,"margin":366114,"mp":20.0736},{"ab":"DC","name":"District of Columbia","ev":3,"n":335909,"total":344356,"base":0.94467,"margin":298737,"mp":86.7524},{"ab":"DE","name":"Delaware","ev":3,"n":496871,"total":504346,"base":0.59627,"margin":95665,"mp":18.9681},{"ab":"FL","name":"Florida","ev":29,"n":10965776,"total":11067456,"base":0.48305,"margin":371686,"mp":3.3584},{"ab":"GA","name":"Georgia","ev":16,"n":4935487,"total":4999960,"base":0.50119,"margin":11779,"mp":0.2356},{"ab":"HI","name":"Hawaii","ev":4,"n":562994,"total":574469,"base":0.65033,"margin":169266,"mp":29.4648},{"ab":"IA","name":"Iowa","ev":6,"n":1656733,"total":1690871,"base":0.45817,"margin":138611,"mp":8.1976},{"ab":"ID","name":"Idaho","ev":4,"n":841140,"total":867934,"base":0.34123,"margin":267098,"mp":30.774},{"ab":"IL","name":"Illinois","ev":20,"n":5918806,"total":6033744,"base":0.58659,"margin":1025024,"mp":16.9882},{"ab":"IN","name":"Indiana","ev":11,"n":2972355,"total":3033210,"base":0.41802,"margin":487359,"mp":16.0674},{"ab":"KS","name":"Kansas","ev":6,"n":1341729,"total":1373986,"base":0.42507,"margin":201083,"mp":14.635},{"ab":"KY","name":"Kentucky","ev":8,"n":2099120,"total":2136768,"base":0.368,"margin":554172,"mp":25.9351},{"ab":"LA","name":"Louisiana","ev":8,"n":2111810,"total":2148062,"base":0.40536,"margin":399742,"mp":18.6094},{"ab":"MA","name":"Massachusetts","ev":11,"n":3549404,"total":3631402,"base":0.67116,"margin":1215000,"mp":33.4582},{"ab":"MD","name":"Maryland","ev":10,"n":2961437,"total":3037030,"base":0.67029,"margin":1008609,"mp":33.2104},{"ab":"ME","name":"Maine","ev":4,"n":795809,"total":819461,"base":0.5467,"margin":74335,"mp":9.0712},{"ab":"MI","name":"Michigan","ev":16,"n":5453892,"total":5539302,"base":0.51414,"margin":154188,"mp":2.7835},{"ab":"MN","name":"Minnesota","ev":10,"n":3201142,"total":3277171,"base":0.5364,"margin":233012,"mp":7.1102},{"ab":"MO","name":"Missouri","ev":10,"n":2971750,"total":3025962,"base":0.42164,"margin":465722,"mp":15.3909},{"ab":"MS","name":"Mississippi","ev":6,"n":1296162,"total":1313759,"base":0.41615,"margin":217366,"mp":16.5453},{"ab":"MT","name":"Montana","ev":3,"n":588388,"total":603674,"base":0.41603,"margin":98816,"mp":16.3691},{"ab":"NC","name":"North Carolina","ev":15,"n":5443067,"total":5524804,"base":0.49316,"margin":74483,"mp":1.3482},{"ab":"ND","name":"North Dakota","ev":3,"n":350793,"total":362024,"base":0.32795,"margin":120709,"mp":33.3428},{"ab":"NE","name":"Nebraska","ev":5,"n":931429,"total":956383,"base":0.40216,"margin":182263,"mp":19.0575},{"ab":"NH","name":"New Hampshire","ev":4,"n":790597,"total":806205,"base":0.53749,"margin":59277,"mp":7.3526},{"ab":"NJ","name":"New Jersey","ev":14,"n":4491713,"total":4549457,"base":0.58071,"margin":725087,"mp":15.9379},{"ab":"NM","name":"New Mexico","ev":5,"n":903508,"total":923965,"base":0.55518,"margin":99720,"mp":10.7926},{"ab":"NV","name":"Nevada","ev":6,"n":1373376,"total":1405376,"base":0.51223,"margin":33596,"mp":2.3905},{"ab":"NY","name":"New York","ev":29,"n":8496883,"total":8616861,"base":0.61727,"margin":1992889,"mp":23.1278},{"ab":"OH","name":"Ohio","ev":18,"n":5833999,"total":5922202,"base":0.45923,"margin":475669,"mp":8.032},{"ab":"OK","name":"Oklahoma","ev":7,"n":1524170,"total":1560699,"base":0.3306,"margin":516390,"mp":33.0871},{"ab":"OR","name":"Oregon","ev":7,"n":2298831,"total":2374321,"base":0.58307,"margin":381935,"mp":16.0861},{"ab":"PA","name":"Pennsylvania","ev":20,"n":6835903,"total":6936976,"base":0.50589,"margin":80555,"mp":1.1612},{"ab":"RI","name":"Rhode Island","ev":4,"n":507408,"total":517757,"base":0.60599,"margin":107564,"mp":20.775},{"ab":"SC","name":"South Carolina","ev":9,"n":2476644,"total":2513329,"base":0.44073,"margin":293562,"mp":11.6802},{"ab":"SD","name":"South Dakota","ev":3,"n":411514,"total":422609,"base":0.36565,"margin":110572,"mp":26.1641},{"ab":"TN","name":"Tennessee","ev":11,"n":2996186,"total":3053851,"base":0.38172,"margin":708764,"mp":23.2089},{"ab":"TX","name":"Texas","ev":38,"n":11149473,"total":11315056,"base":0.47169,"margin":631221,"mp":5.5786},{"ab":"UT","name":"Utah","ev":6,"n":1425422,"total":1488289,"base":0.39306,"margin":304858,"mp":20.4838},{"ab":"VA","name":"Virginia","ev":13,"n":4375998,"total":4460524,"base":0.55155,"margin":451138,"mp":10.114},{"ab":"VT","name":"Vermont","ev":3,"n":355524,"total":367428,"base":0.68299,"margin":130116,"mp":35.4127},{"ab":"WA","name":"Washington","ev":12,"n":3954263,"total":4087631,"base":0.59926,"margin":784961,"mp":19.2033},{"ab":"WI","name":"Wisconsin","ev":10,"n":3241050,"total":3298041,"base":0.50319,"margin":20682,"mp":0.6271},{"ab":"WV","name":"West Virginia","ev":5,"n":781366,"total":794731,"base":0.30201,"margin":309398,"mp":38.9312},{"ab":"WY","name":"Wyoming","ev":3,"n":267050,"total":276765,"base":0.2752,"margin":120068,"mp":43.3827}],"tipping":{"1976":{"state":"Wisconsin","abbr":"WI","margin":35245,"margin_pct":1.6773,"total":2101336,"ev":11,"winner":"D","votes_to_flip":17623},"1980":{"state":"Illinois","abbr":"IL","margin":376636,"margin_pct":7.9296,"total":4749721,"ev":26,"winner":"R","votes_to_flip":188319},"1984":{"state":"Michigan","abbr":"MI","margin":721933,"margin_pct":18.99,"total":3801658,"ev":20,"winner":"R","votes_to_flip":360967},"1988":{"state":"Michigan","abbr":"MI","margin":289703,"margin_pct":7.8956,"total":3669163,"ev":20,"winner":"R","votes_to_flip":144852},"1992":{"state":"Tennessee","abbr":"TN","margin":92221,"margin_pct":4.6514,"total":1982638,"ev":11,"winner":"D","votes_to_flip":46111},"1996":{"state":"Pennsylvania","abbr":"PA","margin":414650,"margin_pct":9.2118,"total":4501307,"ev":23,"winner":"D","votes_to_flip":207326},"2000":{"state":"Florida","abbr":"FL","margin":537,"margin_pct":0.009,"total":5963110,"ev":25,"winner":"R","votes_to_flip":269},"2004":{"state":"Ohio","abbr":"OH","margin":118599,"margin_pct":2.1073,"total":5627903,"ev":20,"winner":"R","votes_to_flip":59300},"2008":{"state":"Colorado","abbr":"CO","margin":214987,"margin_pct":8.9527,"total":2401361,"ev":9,"winner":"D","votes_to_flip":107494},"2012":{"state":"Colorado","abbr":"CO","margin":137858,"margin_pct":5.3651,"total":2569516,"ev":9,"winner":"D","votes_to_flip":68930},"2016":{"state":"Pennsylvania","abbr":"PA","margin":44292,"margin_pct":0.7243,"total":6115402,"ev":20,"winner":"R","votes_to_flip":22147},"2020":{"state":"Wisconsin","abbr":"WI","margin":20682,"margin_pct":0.6271,"total":3298041,"ev":10,"winner":"D","votes_to_flip":10342},"2024":{"state":"Pennsylvania","abbr":"PA","margin":120266,"margin_pct":1.7038,"total":7058732,"ev":19,"winner":"R","votes_to_flip":60134}},"house":{"races":10220,"median_total":208498,"median_total_recent":290564,"median_margin_pct":29.8,"le1":0,"le10":2,"le100":8,"le1000":80,"under_0_5":78,"closest":[{"y":1984,"ab":"IN","d":8,"m":4,"t":234092},{"y":2020,"ab":"IA","d":2,"m":6,"t":413989},{"y":1994,"ab":"CT","d":2,"m":21,"t":186071},{"y":1986,"ab":"IN","d":3,"m":47,"t":152509},{"y":1990,"ab":"MO","d":2,"m":48,"t":188568},{"y":1986,"ab":"NC","d":6,"m":79,"t":144579},{"y":2006,"ab":"CT","d":2,"m":83,"t":242413},{"y":1996,"ab":"PA","d":13,"m":84,"t":245979},{"y":1980,"ab":"PA","d":24,"m":120,"t":174555},{"y":1986,"ab":"MN","d":7,"m":121,"t":189253},{"y":2002,"ab":"CO","d":7,"m":121,"t":172770},{"y":1984,"ab":"ID","d":2,"m":133,"t":202399}],"cycles":{"1976":{"races":435,"uncontested":27,"median_total":175694,"median_margin_pct":31.58,"under_0_5":6,"under_1":11,"under_5":37},"1978":{"races":435,"uncontested":44,"median_total":131736,"median_margin_pct":30.2,"under_0_5":4,"under_1":7,"under_5":30},"1980":{"races":435,"uncontested":28,"median_total":180002,"median_margin_pct":33.94,"under_0_5":3,"under_1":8,"under_5":40},"1982":{"races":435,"uncontested":27,"median_total":153242,"median_margin_pct":29.67,"under_0_5":2,"under_1":9,"under_5":36},"1984":{"races":435,"uncontested":30,"median_total":200648,"median_margin_pct":33.51,"under_0_5":5,"under_1":7,"under_5":29},"1986":{"races":435,"uncontested":46,"median_total":142594,"median_margin_pct":38.94,"under_0_5":4,"under_1":5,"under_5":25},"1988":{"races":435,"uncontested":49,"median_total":196184,"median_margin_pct":38.81,"under_0_5":3,"under_1":6,"under_5":15},"1990":{"races":435,"uncontested":50,"median_total":149139,"median_margin_pct":27.54,"under_0_5":1,"under_1":3,"under_5":30},"1992":{"races":435,"uncontested":14,"median_total":231046,"median_margin_pct":23.62,"under_0_5":3,"under_1":5,"under_5":42},"1994":{"races":435,"uncontested":33,"median_total":168170,"median_margin_pct":26.12,"under_0_5":6,"under_1":11,"under_5":48},"1996":{"races":425,"uncontested":13,"median_total":213094,"median_margin_pct":26.13,"under_0_5":4,"under_1":10,"under_5":45},"1998":{"races":435,"uncontested":42,"median_total":160540,"median_margin_pct":31.42,"under_0_5":1,"under_1":1,"under_5":18},"2000":{"races":435,"uncontested":17,"median_total":229928,"median_margin_pct":33.94,"under_0_5":4,"under_1":6,"under_5":19},"2002":{"races":435,"uncontested":28,"median_total":174608,"median_margin_pct":34.13,"under_0_5":1,"under_1":2,"under_5":22},"2004":{"races":435,"uncontested":29,"median_total":271438,"median_margin_pct":32.81,"under_0_5":2,"under_1":3,"under_5":10},"2006":{"races":431,"uncontested":25,"median_total":192078,"median_margin_pct":29.59,"under_0_5":5,"under_1":8,"under_5":34},"2008":{"races":435,"uncontested":23,"median_total":291682,"median_margin_pct":29.41,"under_0_5":3,"under_1":7,"under_5":25},"2010":{"races":435,"uncontested":11,"median_total":203384,"median_margin_pct":28.39,"under_0_5":3,"under_1":7,"under_5":42},"2012":{"races":435,"uncontested":11,"median_total":287354,"median_margin_pct":26.3,"under_0_5":3,"under_1":8,"under_5":29},"2014":{"races":435,"uncontested":23,"median_total":178236,"median_margin_pct":29.12,"under_0_5":1,"under_1":2,"under_5":23},"2016":{"races":434,"uncontested":22,"median_total":307881,"median_margin_pct":29.53,"under_0_5":0,"under_1":3,"under_5":18},"2018":{"races":435,"uncontested":17,"median_total":275620,"median_margin_pct":25.5,"under_0_5":5,"under_1":10,"under_5":46},"2020":{"races":434,"uncontested":7,"median_total":357157,"median_margin_pct":26.15,"under_0_5":2,"under_1":4,"under_5":42},"2022":{"races":433,"uncontested":8,"median_total":253865,"median_margin_pct":27.22,"under_0_5":4,"under_1":11,"under_5":38},"2024":{"races":433,"uncontested":11,"median_total":351047,"median_margin_pct":26.15,"under_0_5":3,"under_1":5,"under_5":37}}},"senate":{"races":855,"median_total":1292700,"median_total_recent":1859851,"median_margin_pct":17.5,"le100":0,"le1000":3,"closest":[{"y":2008,"ab":"MN","m":312,"t":2885281},{"y":1998,"ab":"NV","m":401,"t":435864},{"y":2002,"ab":"SD","m":532,"t":337501},{"y":2016,"ab":"NH","m":1017,"t":739140},{"y":1988,"ab":"WY","m":1322,"t":180964},{"y":2022,"ab":"AK","m":2017,"t":263526},{"y":1986,"ab":"ND","m":2120,"t":289013},{"y":2000,"ab":"WA","m":2229,"t":2461379},{"y":1980,"ab":"VT","m":2755,"t":209002},{"y":2012,"ab":"ND","m":2936,"t":319738}]},"sler":{"races":110957,"contested":82590,"median_total":16390,"q1_total":8163,"q3_total":32060,"median_margin_pct":24.29,"margin_le_1":26,"margin_le_10":189,"margin_le_100":1946,"under_0_1_pct":238,"under_0_5_pct":1183,"years":[1968,2016],"closest":[{"year":1986,"state":"ma","chamber":"house","district":"7.0","total":66112,"margin":0,"contested":true},{"year":1984,"state":"mn","chamber":"house","district":"24.0","total":30299,"margin":0,"contested":true},{"year":2012,"state":"nh","chamber":"house","district":"9.0","total":23038,"margin":0,"contested":true},{"year":1978,"state":"me","chamber":"house","district":"4.0","total":10313,"margin":0,"contested":true},{"year":1978,"state":"ri","chamber":"senate","district":"29.0","total":8220,"margin":0,"contested":true},{"year":1994,"state":"ks","chamber":"house","district":"79.0","total":6062,"margin":0,"contested":true},{"year":1980,"state":"nm","chamber":"house","district":"19.0","total":4654,"margin":0,"contested":true},{"year":1998,"state":"ak","chamber":"house","district":"36.0","total":4638,"margin":0,"contested":true},{"year":2004,"state":"mt","chamber":"house","district":"12.0","total":4225,"margin":0,"contested":true},{"year":1994,"state":"wy","chamber":"house","district":"21.0","total":3882,"margin":0,"contested":true},{"year":2000,"state":"mt","chamber":"house","district":"41.0","total":1586,"margin":0,"contested":true},{"year":1988,"state":"ny","chamber":"senate","district":"55.0","total":116820,"margin":1,"contested":true},{"year":1974,"state":"ny","chamber":"house","district":"148.0","total":41831,"margin":1,"contested":true},{"year":1994,"state":"mn","chamber":"house","district":"57.0","total":27058,"margin":1,"contested":true},{"year":1991,"state":"va","chamber":"house","district":"53.0","total":12985,"margin":1,"contested":true},{"year":1992,"state":"ia","chamber":"house","district":"43.0","total":12543,"margin":1,"contested":true},{"year":1982,"state":"nh","chamber":"senate","district":"8.0","total":10703,"margin":1,"contested":true},{"year":2008,"state":"ak","chamber":"house","district":"7.0","total":10035,"margin":1,"contested":true},{"year":1970,"state":"mo","chamber":"house","district":"116.0","total":9637,"margin":1,"contested":true},{"year":2014,"state":"sd","chamber":"senate","district":"17.0","total":6671,"margin":1,"contested":true},{"year":2002,"state":"ct","chamber":"house","district":"65.0","total":6471,"margin":1,"contested":true},{"year":1978,"state":"nd","chamber":"senate","district":"27.0","total":4918,"margin":1,"contested":true},{"year":1980,"state":"ut","chamber":"house","district":"44.0","total":3861,"margin":1,"contested":true},{"year":1970,"state":"ri","chamber":"house","district":"26.0","total":3519,"margin":1,"contested":true},{"year":2002,"state":"wy","chamber":"house","district":"36.0","total":2921,"margin":1,"contested":true}],"median_house":13495,"house_races":61575,"median_senate":29680,"senate_races":21018,"ties":11,"wy_house_median":3158,"wy_house_races":340,"me_house_median":4180,"me_house_races":1250},"primaries":{"pres_official":{"D":36266620,"R":19635660,"all":56026380},"pres_general":158429631,"by_state":{"AL":{"D":452093,"R":724222},"AK":{"D":19589},"AZ":{"D":536509},"AR":{"D":229122,"R":246044},"CA":{"D":5784364,"R":2471580},"CO":{"D":960128,"R":681623},"CT":{"D":264416,"R":91451},"DE":{"D":91682,"R":32796},"DC":{"D":110688,"R":1559},"FL":{"D":1739214,"R":1239939},"GA":{"D":1287918,"R":1033313},"ID":{"D":108651,"R":118958},"IL":{"D":1674133,"R":542800},"IN":{"D":497927,"R":549246},"KS":{"D":143183},"KY":{"D":537905,"R":429006},"LA":{"R":267286},"ME":{"D":202520,"R":95360},"MD":{"D":1050773,"R":342290},"MA":{"D":1414119,"R":274760},"MI":{"D":1587679,"R":683431},"MN":{"D":744198,"R":140555},"MS":{"D":274391,"R":245381},"MO":{"D":666112,"R":311793},"MT":{"D":149981,"R":213393},"NE":{"D":164582,"R":266655},"NH":{"D":298377,"R":153711},"NJ":{"D":954599,"R":404284},"NM":{"D":247880,"R":157876},"NY":{"D":1618932},"NC":{"D":1332382,"R":802527},"OH":{"D":894383,"R":713546},"OK":{"D":304281,"R":295601},"OR":{"D":618711,"R":385257},"PA":{"D":1616169,"R":1158633},"RI":{"D":103982,"R":22009},"SC":{"D":539263},"SD":{"D":52661},"TN":{"D":516250,"R":398314},"TX":{"D":2094428,"R":2017167},"UT":{"D":220582,"R":344852},"VT":{"R":38776,"D":157652},"VA":{"D":1323693},"WA":{"D":1558776,"R":695275},"WV":{"D":186515,"R":209898},"WI":{"D":925065,"R":630198}},"house2020":{"median_general":362552,"median_primary":85379,"safe":264,"total":435},"house2022":{"median_general":251999,"median_primary":71497,"safe":284,"total":435}},"flip":{"1976":{"winner":"D","ev_winner":297,"ev_loser":241,"switchers":8354,"states":["HI","OH"],"ev_flipped":29,"tip_state":"Wisconsin","tip_abbr":"WI","tip_margin":35245,"tip_total":2101336,"national_total":81601344},"1980":{"winner":"R","ev_winner":489,"ev_loser":49,"switchers":729379,"states":["AL","AR","DE","IL","KY","LA","ME","MA","MI","MS","NY","NC","PA","SC","TN","VT","WI"],"ev_flipped":222,"tip_state":"Illinois","tip_abbr":"IL","tip_margin":376636,"tip_total":4749721,"national_total":86496851},"1984":{"winner":"R","ev_winner":525,"ev_loser":13,"switchers":2680257,"states":["AK","CA","DE","GA","HI","IL","IA","ME","MD","MA","MT","NV","NM","NY","OR","PA","RI","TN","VT","WA","WV","WI","WY"],"ev_flipped":257,"tip_state":"Michigan","tip_abbr":"MI","tip_margin":721933,"tip_total":3801658,"national_total":92654861},"1988":{"winner":"R","ev_winner":426,"ev_loser":112,"switchers":537766,"states":["CA","CO","CT","DE","IL","ME","MD","MO","MT","NM","ND","PA","SD","VT"],"ev_flipped":158,"tip_state":"Michigan","tip_abbr":"MI","tip_margin":289703,"tip_total":3669163,"national_total":91586825},"1992":{"winner":"D","ev_winner":370,"ev_loser":168,"switchers":284837,"states":["CO","DE","GA","HI","KY","LA","MT","NV","NH","NJ","OH","TN"],"ev_flipped":103,"tip_state":"Tennessee","tip_abbr":"TN","tip_margin":92221,"tip_total":1982638,"national_total":104599780},"1996":{"winner":"D","ev_winner":379,"ev_loser":159,"switchers":575514,"states":["AZ","FL","IA","KY","MO","NV","NH","NM","OH","OR","TN"],"ev_flipped":111,"tip_state":"Pennsylvania","tip_abbr":"PA","tip_margin":414650,"tip_total":4501307,"national_total":96389818},"2000":{"winner":"R","ev_winner":271,"ev_loser":267,"switchers":269,"states":["FL"],"ev_flipped":25,"tip_state":"Florida","tip_abbr":"FL","tip_margin":537,"tip_total":5963110,"national_total":105593982},"2004":{"winner":"R","ev_winner":286,"ev_loser":252,"switchers":57787,"states":["CO","IA","NM"],"ev_flipped":21,"tip_state":"Ohio","tip_abbr":"OH","tip_margin":118599,"tip_total":5627903,"national_total":122349450},"2008":{"winner":"D","ev_winner":364,"ev_loser":174,"switchers":495316,"states":["FL","IN","IA","NH","NC","OH","VA"],"ev_flipped":97,"tip_state":"Colorado","tip_abbr":"CO","tip_margin":214987,"tip_total":2401361,"national_total":131419253},"2012":{"winner":"D","ev_winner":332,"ev_loser":206,"switchers":214735,"states":["FL","NH","OH","VA"],"ev_flipped":64,"tip_state":"Colorado","tip_abbr":"CO","tip_margin":137858,"tip_total":2569516,"national_total":129139997},"2016":{"winner":"R","ev_winner":305,"ev_loser":233,"switchers":38875,"states":["MI","PA","WI"],"ev_flipped":46,"tip_state":"Pennsylvania","tip_abbr":"PA","tip_margin":44292,"tip_total":6115402,"national_total":136787187},"2020":{"winner":"D","ev_winner":306,"ev_loser":232,"switchers":38260,"states":["AZ","GA","NV","WI"],"ev_flipped":43,"tip_state":"Wisconsin","tip_abbr":"WI","tip_margin":20682,"tip_total":3298041,"national_total":158429631},"2024":{"winner":"R","ev_winner":312,"ev_loser":226,"switchers":114885,"states":["MI","PA","WI"],"ev_flipped":44,"tip_state":"Pennsylvania","tip_abbr":"PA","tip_margin":120266,"tip_total":7058732,"national_total":155238302}},"scaling":{"bands":[{"v":4229,"q":0.0009213089852392431,"races":13765},{"v":8163,"q":0.00035663573622164246,"races":13765},{"v":12963,"q":0.00028728989862298975,"races":13765},{"v":20441,"q":0.00015850477165406333,"races":13765},{"v":32060,"q":0.00015850477165406333,"races":13765},{"v":62924,"q":9.906548228378958e-05,"races":13765}],"slope":-0.79,"races":82590,"M":10},"bibliography":["Anzia, S. F. (2011), &ldquo;Election Timing and the Electoral Influence of Interest Groups,&rdquo; <cite>The Journal of Politics</cite> 73(2): 412&ndash;427.","Beck, N. (1975), &ldquo;A note on the probability of a tied election,&rdquo; <cite>Public Choice</cite> 23(1): 75&ndash;79.","Blais, A., and C. H. Achen (2019), &ldquo;Civic Duty and Voter Turnout,&rdquo; <cite>Political Behavior</cite> 41(2): 473&ndash;497.","Brennan, G., and L. Lomasky (1993), <cite>Democracy and Decision: The Pure Theory of Electoral Preference</cite>, Cambridge: Cambridge University Press.","Bureau of Labor Statistics (2026), <cite>Occupational Employment and Wage Statistics, May 2025</cite>.","Caplan, B. (2007), <cite>The Myth of the Rational Voter: Why Democracies Choose Bad Policies</cite>, Princeton: Princeton University Press.","Chamberlain, G. and Rothschild, M. (1981), &ldquo;A note on the probability of casting a decisive vote,&rdquo; <cite>Journal of Economic Theory</cite> 25(1): 152&ndash;162.","Chen, M. K., Haggag, K., Pope, D. G., and Rohla, R. (2022), &ldquo;Racial Disparities in Voting Wait Times: Evidence from Smartphone Data,&rdquo; <cite>The Review of Economics and Statistics</cite> 104(6): 1341&ndash;1350.","Downs, A. (1957), <cite>An Economic Theory of Democracy</cite>, New York: Harper and Row.","Edlin, A., A. Gelman, and N. Kaplan (2007), &ldquo;Voting as a Rational Choice: Why and How People Vote to Improve the Well-Being of Others,&rdquo; <cite>Rationality and Society</cite> 19(3): 293&ndash;314.","Edlin, A., A. Gelman, and N. Kaplan (2007), &ldquo;Voting as a Rational Choice: Why and How People Vote to Improve the Well-Being of Others,&rdquo; <cite>Rationality and Society</cite> 19(3): 293&ndash;314.","FairVote (2024), <cite>A Survey and Analysis of Statewide Election Recounts, 2000&ndash;2023</cite>.","Feddersen, T. J. (2004), &ldquo;Rational Choice Theory and the Paradox of Not Voting,&rdquo; <cite>Journal of Economic Perspectives</cite> 18(1): 99&ndash;112.","Ferejohn, J. A. and Fiorina, M. P. (1974), &ldquo;The Paradox of Not Voting: A Decision Theoretic Analysis,&rdquo; <cite>American Political Science Review</cite> 68(2): 525&ndash;536.","Gelman, A., G. King, and W. J. Boscardin (1998), &ldquo;Estimating the Probability of Events That Have Never Occurred: When Is Your Vote Decisive?&rdquo; <cite>Journal of the American Statistical Association</cite> 93(441): 1&ndash;9.","Gelman, A., J. N. Katz, and F. Tuerlinckx (2002), &ldquo;The Mathematics and Statistics of Voting Power,&rdquo; <cite>Statistical Science</cite> 17(4): 420&ndash;435.","Gelman, A., J. N. Katz, and J. Bafumi (2004), &ldquo;Standard Voting Power Indexes Do Not Work: An Empirical Analysis,&rdquo; <cite>British Journal of Political Science</cite> 34(4): 657&ndash;674.","Good, I. J. and Mayer, L. S. (1975), &ldquo;Estimating the efficacy of a vote,&rdquo; <cite>Behavioral Science</cite> 20(1): 25&ndash;33.","Jurjevich, J. R., P. Keisling, K. Rancik, C. Gorecki, and S. Hawke (2016), <cite>Who Votes for Mayor?</cite>, Portland State University.","Lee, D. S. (2008), &ldquo;Randomized experiments from non-random selection in U.S. House elections,&rdquo; <cite>Journal of Econometrics</cite> 142(2): 675&ndash;697.","Margolis, H. (1977), &ldquo;Probability of a tie election,&rdquo; <cite>Public Choice</cite> 31(1): 135&ndash;138.","Mulligan, C. B. and Hunter, C. G. (2003), &ldquo;The Empirical Frequency of a Pivotal Vote,&rdquo; <cite>Public Choice</cite> 116(1-2): 31&ndash;54.","Owen, G. and Grofman, B. (1984), &ldquo;To vote or not to vote: The paradox of nonvoting,&rdquo; <cite>Public Choice</cite> 42(3): 311&ndash;325.","Pettigrew, S. (2017), &ldquo;The Racial Gap in Wait Times: Why Minority Precincts Are Underserved by Local Election Officials,&rdquo; <cite>Political Science Quarterly</cite> 132(3): 527&ndash;547.","Riker, W. H. and Ordeshook, P. C. (1968), &ldquo;A Theory of the Calculus of Voting,&rdquo; <cite>American Political Science Review</cite> 62(1): 25&ndash;42.","Sobel, R. (2014), <cite>The High Cost of &lsquo;Free&rsquo; Photo Voter Identification Cards</cite>, Charles Hamilton Houston Institute for Race and Justice, Harvard Law School.","Stewart, C., and S. Ansolabehere (2013), <cite>Waiting to Vote in 2012</cite>, report to the US Election Assistance Commission.","US Census Bureau (2025), <cite>Voting and Registration in the Election of November 2024</cite>, Current Population Reports P20-590."],"local":{"racine_yes":16715,"racine_no":16711,"dallas_turnout":6.1,"fort_worth_turnout":6.5,"las_vegas_turnout":9.4,"portland_turnout":59.4,"median_mayoral_voter_age":57,"cities_under_15":10,"cities_studied":30},"pres2024_total":155238302,"pres2024_two_party":152320193}</script>
+<script>window.__VOTE_DATA__ = JSON.parse(document.getElementById("voteData").textContent);</script>
+<script>
+/* ===========================================================================
+   The Pivotal Voter — computation and rendering.
+   Every figure on the page is computed here from the returns in DATA.
+   =========================================================================== */
+(function () {
+"use strict";
+
+var DATA = window.__VOTE_DATA__;
+
+/* --- mathematics -------------------------------------------------------- */
+
+var SQRT2PI = Math.sqrt(2 * Math.PI);
+function phi(z) { return Math.exp(-0.5 * z * z) / SQRT2PI; }
+
+function lnGamma(x) {
+  var g = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+           771.32342877765313, -176.61502916214059, 12.507343278686905,
+           -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - lnGamma(1 - x);
+  x -= 1;
+  var a = g[0], t = x + 7.5;
+  for (var i = 1; i < 9; i++) a += g[i] / (x + i);
+  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+}
+function lnChoose(n, k) { return lnGamma(n + 1) - lnGamma(k + 1) - lnGamma(n - k + 1); }
+
+// Natural log of the coin-flip pivot probability, so the answer survives
+// electorates where the probability itself underflows to zero.
+function lnBinomialPivot(n, p) {
+  n = Math.round(n);
+  if (n <= 0) return 0;
+  if (p <= 0 || p >= 1) return -Infinity;
+  if (n % 2 === 0) {
+    var k = n / 2;
+    return lnChoose(n, k) + k * Math.log(p) + k * Math.log(1 - p);
+  }
+  var j = (n - 1) / 2;
+  var a = lnChoose(n, j) + j * Math.log(p) + (n - j) * Math.log(1 - p);
+  var b = lnChoose(n, j + 1) + (j + 1) * Math.log(p) + (n - j - 1) * Math.log(1 - p);
+  var m = Math.max(a, b);
+  return Math.log(0.5) + m + Math.log(Math.exp(a - m) + Math.exp(b - m));
+}
+
+// The forecast model: the density of the vote share at one half, over n.
+function sharePivot(n, mu, sd) {
+  if (n <= 0 || sd <= 0) return 0;
+  return phi((0.5 - mu) / sd) / (n * sd);
+}
+
+/* --- formatting --------------------------------------------------------- */
+
+var SCALES = [
+  [1e33, "decillion"], [1e30, "nonillion"], [1e27, "octillion"],
+  [1e24, "septillion"], [1e21, "sextillion"], [1e18, "quintillion"],
+  [1e15, "quadrillion"], [1e12, "trillion"], [1e9, "billion"], [1e6, "million"]
+];
+
+function commas(x) { return Math.round(x).toLocaleString("en-US"); }
+
+// "1 in 1,253" / "1 in 3.3 million" / "1 in 9.4 × 10^89"
+function oddsFromLog(lnP) {
+  if (!isFinite(lnP) || lnP === -Infinity) return "never";
+  var log10k = -lnP / Math.LN10;
+  if (log10k <= 0) return "better than even";
+  if (log10k > 36) {
+    var e = Math.floor(log10k), m = Math.pow(10, log10k - e);
+    return "1 in " + m.toFixed(1) + " × 10" + superscript(e);
+  }
+  var k = Math.pow(10, log10k);
+  for (var i = 0; i < SCALES.length; i++) {
+    if (k >= SCALES[i][0]) {
+      var v = k / SCALES[i][0];
+      return "1 in " + (v < 10 ? v.toFixed(1) : commas(v)) + " " + SCALES[i][1];
+    }
+  }
+  return "1 in " + commas(k);
+}
+function odds(p) { return p > 0 ? oddsFromLog(Math.log(p)) : "never"; }
+
+var SUPS = { "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+             "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+function superscript(n) {
+  return String(n).split("").map(function (c) { return SUPS[c] || c; }).join("");
+}
+
+function pct(x, dp) { return (100 * x).toFixed(dp === undefined ? 1 : dp) + "%"; }
+
+/* --- svg helpers -------------------------------------------------------- */
+
+var NS = "http://www.w3.org/2000/svg";
+function el(name, attrs, text) {
+  var e = document.createElementNS(NS, name);
+  for (var k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+var INK = "#1a1a1a", SOFT = "#4f4a42", FAINT = "#7a736a",
+    RULE = "#d9d2c3", RULE_SOFT = "#e6e0d2",
+    A = "#1c7aa8", B = "#b8482e", PAPER = "#fbf9f3";
+
+function axisLine(g, x1, y1, x2, y2, colour) {
+  g.appendChild(el("line", { x1: x1, y1: y1, x2: x2, y2: y2,
+    stroke: colour || RULE, "stroke-width": 1 }));
+}
+function label(g, x, y, text, opts) {
+  opts = opts || {};
+  g.appendChild(el("text", {
+    x: x, y: y, "text-anchor": opts.anchor || "middle",
+    "font-size": opts.size || 11, fill: opts.fill || FAINT,
+    "font-family": "EB Garamond, Georgia, serif",
+    "letter-spacing": opts.tracking || 0,
+    "dominant-baseline": opts.baseline || "auto"
+  }, text));
+}
+
+// Nice powers-of-ten ticks spanning a log10 range.
+function decadeTicks(lo, hi, maxTicks) {
+  var span = hi - lo, step = 1;
+  while (span / step > (maxTicks || 8)) step++;
+  var ticks = [], start = Math.ceil(lo / step) * step;
+  for (var v = start; v <= hi; v += step) ticks.push(v);
+  return ticks;
+}
+function tickText(log10k) {
+  if (log10k > 15) return "10" + superscript(Math.round(log10k));
+  var k = Math.pow(10, log10k);
+  for (var i = 0; i < SCALES.length; i++) {
+    if (k >= SCALES[i][0]) {
+      var v = k / SCALES[i][0];
+      var w = SCALES[i][1];
+      return (v < 10 ? String(Math.round(v * 10) / 10) : commas(v)) + " " + w.slice(0, 2) + ".";
+    }
+  }
+  return commas(k);
+}
+
+/* --- tooltip ------------------------------------------------------------ */
+
+var tip = document.createElement("div");
+tip.className = "tooltip";
+tip.setAttribute("role", "status");
+document.body.appendChild(tip);
+function showTip(evt, html) {
+  tip.innerHTML = html;
+  tip.style.opacity = "1";
+  var pad = 14;
+  var x = evt.clientX + pad, y = evt.clientY + pad;
+  var r = tip.getBoundingClientRect();
+  if (x + r.width > window.innerWidth - 8) x = evt.clientX - r.width - pad;
+  if (y + r.height > window.innerHeight - 8) y = evt.clientY - r.height - pad;
+  tip.style.left = x + "px";
+  tip.style.top = y + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+function hoverable(node, html) {
+  node.addEventListener("mouseenter", function (e) { showTip(e, html); });
+  node.addEventListener("mousemove", function (e) { showTip(e, html); });
+  node.addEventListener("mouseleave", hideTip);
+  node.style.cursor = "default";
+}
+
+/* =========================================================================
+   Instrument 1 — the coin-flip model
+   ========================================================================= */
+
+var cfP = document.getElementById("cfP"), cfN = document.getElementById("cfN");
+
+function drawCoinFlip() {
+  var p = +cfP.value / 1000;
+  var n = Math.round(Math.pow(10, +cfN.value));
+  document.getElementById("cfPVal").textContent = p.toFixed(3);
+  document.getElementById("cfNVal").textContent = commas(n);
+
+  var svg = document.getElementById("cfChart");
+  clear(svg);
+  var W = 720, H = 300, L = 64, R = 18, T = 18, Bm = 44;
+
+  var xs = [], ys = [];
+  for (var i = 0; i <= 200; i++) {
+    var pp = 0.48 + (0.04 * i) / 200;
+    xs.push(pp);
+    ys.push(lnBinomialPivot(n, pp) / Math.LN10);   // log10 of the probability
+  }
+  var yMax = Math.max.apply(null, ys);
+  var yMin = Math.min.apply(null, ys);
+  if (!isFinite(yMin) || yMin < -400) yMin = -400;
+  var pad = (yMax - yMin) * 0.08 || 1;
+  var lo = yMin - pad, hi = Math.min(0, yMax + pad);
+
+  var X = function (v) { return L + ((v - 0.48) / 0.04) * (W - L - R); };
+  var Y = function (v) { return T + (1 - (Math.max(v, lo) - lo) / (hi - lo)) * (H - T - Bm); };
+
+  var ticks = decadeTicks(lo, hi, 7);
+  ticks.forEach(function (t) {
+    axisLine(svg, L, Y(t), W - R, Y(t), RULE_SOFT);
+    label(svg, L - 8, Y(t) + 3, "1 in 10" + superscript(Math.round(-t)),
+      { anchor: "end", size: 10 });
+  });
+  axisLine(svg, L, T, L, H - Bm);
+  axisLine(svg, L, H - Bm, W - R, H - Bm);
+
+  [0.48, 0.49, 0.50, 0.51, 0.52].forEach(function (t) {
+    label(svg, X(t), H - Bm + 18, t.toFixed(2), { size: 11 });
+  });
+  label(svg, (L + W - R) / 2, H - 8, "probability each voter favours candidate A",
+    { size: 11, fill: SOFT });
+
+  var d = "";
+  for (var j = 0; j < xs.length; j++) {
+    d += (j ? "L" : "M") + X(xs[j]).toFixed(2) + " " + Y(ys[j]).toFixed(2);
+  }
+  svg.appendChild(el("path", { d: d, fill: "none", stroke: A, "stroke-width": 2,
+    "stroke-linejoin": "round" }));
+
+  var lnHere = lnBinomialPivot(n, p);
+  var yHere = lnHere / Math.LN10;
+  svg.appendChild(el("line", { x1: X(p), y1: T, x2: X(p), y2: H - Bm,
+    stroke: B, "stroke-width": 1, "stroke-dasharray": "3 3" }));
+  svg.appendChild(el("circle", { cx: X(p), cy: Y(yHere), r: 5, fill: B,
+    stroke: PAPER, "stroke-width": 2 }));
+
+  document.getElementById("cfOdds").textContent = oddsFromLog(lnHere);
+  var expected = Math.abs(2 * p - 1) * n;
+  document.getElementById("cfMargin").textContent =
+    expected < 1 ? "0 votes" : commas(expected) + " votes";
+  document.getElementById("cfCompare").textContent = comparison(lnHere);
+  document.getElementById("cfCaption").textContent =
+    "With " + commas(n) + " other voters, the model's answer runs from "
+    + oddsFromLog(lnBinomialPivot(n, 0.5)) + " at a perfect coin to "
+    + oddsFromLog(lnBinomialPivot(n, 0.52)) + " two points away from one.";
+}
+
+// A physical yardstick for probabilities the reader cannot picture.
+function comparison(lnP) {
+  var log10k = -lnP / Math.LN10;
+  if (log10k < 3.2) return "drawing one named card from three decks";
+  if (log10k < 5) return "a royal flush, dealt straight";
+  if (log10k < 7) return "being struck by lightning this year";
+  if (log10k < 9) return "one particular lottery ticket";
+  if (log10k < 14) return "two lightning strikes, both this year";
+  if (log10k < 25) return "one named grain of sand on a beach";
+  if (log10k < 60) return "one named atom in a litre of water";
+  if (log10k < 200) return "one named atom in the observable universe";
+  return "nothing physical is this unlikely";
+}
+
+/* =========================================================================
+   Instrument 2 — the forecast model
+   ========================================================================= */
+
+var fmN = document.getElementById("fmN"), fmMu = document.getElementById("fmMu"),
+    fmSd = document.getElementById("fmSd");
+
+function drawForecast() {
+  var n = Math.round(Math.pow(10, +fmN.value));
+  var mu = +fmMu.value / 1000;
+  var sd = +fmSd.value / 1000;
+  document.getElementById("fmNVal").textContent = commas(n);
+  document.getElementById("fmMuVal").textContent = pct(mu);
+  document.getElementById("fmSdVal").textContent = (sd * 100).toFixed(1) + " pts";
+
+  var svg = document.getElementById("fmChart");
+  clear(svg);
+  var W = 720, H = 320, L = 76, R = 18, T = 18, Bm = 46;
+
+  var series = [
+    { sd: sd / 2, colour: A, opacity: 0.28, name: "half your σ" },
+    { sd: sd, colour: A, opacity: 1, name: "your σ" },
+    { sd: sd * 2, colour: A, opacity: 0.28, name: "double your σ" }
+  ];
+
+  var lo = Infinity, hi = -Infinity, curves = [];
+  series.forEach(function (s) {
+    var pts = [];
+    for (var i = 0; i <= 220; i++) {
+      var m = 0.40 + (0.20 * i) / 220;
+      var v = Math.log10(sharePivot(n, m, s.sd));
+      pts.push([m, v]);
+      if (isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    }
+    curves.push({ pts: pts, s: s });
+  });
+  lo = Math.max(lo, hi - 9);
+  var padY = (hi - lo) * 0.1;
+  lo -= padY; hi += padY;
+
+  var X = function (v) { return L + ((v - 0.40) / 0.20) * (W - L - R); };
+  var Y = function (v) { return T + (1 - (Math.max(v, lo) - lo) / (hi - lo)) * (H - T - Bm); };
+
+  decadeTicks(lo, hi, 7).forEach(function (t) {
+    axisLine(svg, L, Y(t), W - R, Y(t), RULE_SOFT);
+    label(svg, L - 8, Y(t) + 3, "1 in " + tickText(-t), { anchor: "end", size: 10 });
+  });
+  axisLine(svg, L, T, L, H - Bm);
+  axisLine(svg, L, H - Bm, W - R, H - Bm);
+  [0.40, 0.45, 0.50, 0.55, 0.60].forEach(function (t) {
+    label(svg, X(t), H - Bm + 18, pct(t, 0), { size: 11 });
+  });
+  label(svg, (L + W - R) / 2, H - 8, "where the forecast is centred, as a share of the two-party vote",
+    { size: 11, fill: SOFT });
+
+  curves.forEach(function (c) {
+    var d = "";
+    c.pts.forEach(function (pt, j) {
+      d += (j ? "L" : "M") + X(pt[0]).toFixed(2) + " " + Y(pt[1]).toFixed(2);
+    });
+    svg.appendChild(el("path", { d: d, fill: "none", stroke: c.s.colour,
+      "stroke-width": c.s.opacity === 1 ? 2 : 1.25, opacity: c.s.opacity,
+      "stroke-linejoin": "round" }));
+  });
+
+  var p = sharePivot(n, mu, sd);
+  svg.appendChild(el("line", { x1: X(mu), y1: T, x2: X(mu), y2: H - Bm,
+    stroke: B, "stroke-width": 1, "stroke-dasharray": "3 3" }));
+  svg.appendChild(el("circle", { cx: X(mu), cy: Y(Math.log10(p)), r: 5, fill: B,
+    stroke: PAPER, "stroke-width": 2 }));
+
+  var lnCoin = lnBinomialPivot(n, mu);
+  document.getElementById("fmOdds").textContent = odds(p);
+  document.getElementById("fmCoin").textContent = oddsFromLog(lnCoin);
+  var ratioLog = (Math.log(p) - lnCoin) / Math.LN10;
+  document.getElementById("fmRatio").textContent =
+    ratioLog < 0.05 ? "the two agree"
+      : ratioLog > 6 ? "10" + superscript(Math.round(ratioLog)) + " times larger"
+      : commas(Math.pow(10, ratioLog)) + " times larger";
+  document.getElementById("fmCaption").textContent =
+    "Faint curves show the same election with half and double your forecast error. "
+    + "A wider forecast lowers the peak and raises the tails: uncertainty helps a "
+    + "voter in a state that looks safe and hurts one in a state that looks tied.";
+}
+
+/* =========================================================================
+   Instrument 3 — the electoral college
+   ========================================================================= */
+
+var ecState = document.getElementById("ecState"),
+    ecNat = document.getElementById("ecNat"), ecSt = document.getElementById("ecSt");
+
+DATA.pres2024.slice().sort(function (a, b) { return a.name < b.name ? -1 : 1; })
+  .forEach(function (s) {
+    var o = document.createElement("option");
+    o.value = s.ab; o.textContent = s.name;
+    ecState.appendChild(o);
+  });
+ecState.value = "PA";
+
+function rng(seed) {
+  var s = seed >>> 0;
+  return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+function normals(rand) {
+  var spare = null;
+  return function () {
+    if (spare !== null) { var v = spare; spare = null; return v; }
+    var u, w, r;
+    do { u = 2 * rand() - 1; w = 2 * rand() - 1; r = u * u + w * w; } while (r === 0 || r >= 1);
+    var f = Math.sqrt(-2 * Math.log(r) / r);
+    spare = w * f;
+    return u * f;
+  };
+}
+
+// One simulation pass serves every state: each state's own shock is integrated
+// analytically, so a draw contributes a density weight rather than a rare hit.
+function pivotByState(states, sdNat, sdSt, draws, seed) {
+  var m = states.length;
+  var acc = new Float64Array(m), won = new Uint8Array(m);
+  var rand = rng(seed), z = normals(rand);
+  for (var d = 0; d < draws; d++) {
+    var u = sdNat * z(), evD = 0, i;
+    for (i = 0; i < m; i++) {
+      var v = states[i].base + u + sdSt * z();
+      won[i] = v > 0.5 ? 1 : 0;
+      if (won[i]) evD += states[i].ev;
+    }
+    for (i = 0; i < m; i++) {
+      var without = evD - (won[i] ? states[i].ev : 0);
+      if (without < 270 && without + states[i].ev >= 270) {
+        acc[i] += phi((0.5 - states[i].base - u) / sdSt) / sdSt;
+      }
+    }
+  }
+  var sdTot = Math.sqrt(sdNat * sdNat + sdSt * sdSt);
+  return states.map(function (s, k) {
+    var pTie = phi((0.5 - s.base) / sdTot) / (sdTot * s.n);
+    var p = acc[k] / draws / s.n;
+    return { ab: s.ab, name: s.name, ev: s.ev, n: s.n, mp: s.mp, margin: s.margin,
+             pTie: pTie, p: p, pDec: pTie > 0 ? p / pTie : 0 };
+  });
+}
+
+function drawElectoral() {
+  var sdNat = +ecNat.value / 1000, sdSt = +ecSt.value / 1000;
+  document.getElementById("ecNatVal").textContent = (sdNat * 100).toFixed(1) + " pts";
+  document.getElementById("ecStVal").textContent = (sdSt * 100).toFixed(1) + " pts";
+
+  var rows = pivotByState(DATA.pres2024, sdNat, sdSt, 20000, 20240101);
+  rows.sort(function (a, b) { return b.p - a.p; });
+  lastEC = rows;
+
+  var mine = null, rank = 0;
+  rows.forEach(function (r, i) { if (r.ab === ecState.value) { mine = r; rank = i + 1; } });
+
+  document.getElementById("ecTie").textContent = odds(mine.pTie);
+  document.getElementById("ecTieNote").textContent =
+    commas(mine.n) + " two-party votes in 2024, decided by " + commas(mine.margin)
+      + " (" + mine.mp.toFixed(2) + " points).";
+  document.getElementById("ecDec").textContent =
+    mine.pDec > 0.0005 ? (100 * mine.pDec).toFixed(1) + "%" : "under 0.05%";
+  document.getElementById("ecTotal").textContent = odds(mine.p);
+  document.getElementById("ecRank").textContent =
+    "Rank " + rank + " of " + rows.length + " states.";
+
+  var top = rows.slice(0, 15);
+  if (rank > 15) top.push(mine);
+
+  var svg = document.getElementById("ecChart");
+  clear(svg);
+  var W = 720, H = 460, L = 118, R = 96, T = 26, Bm = 40;
+  var rowH = (H - T - Bm) / top.length;
+
+  var logs = rows.filter(function (r) { return r.p > 0; })
+                 .map(function (r) { return Math.log10(r.p); });
+  var hi = Math.max.apply(null, logs), lo = Math.min.apply(null, top.map(function (r) {
+    return r.p > 0 ? Math.log10(r.p) : hi - 8;
+  }));
+  lo = Math.min(lo, hi - 1.2) - 0.35; hi += 0.15;
+  var X = function (v) { return L + ((v - lo) / (hi - lo)) * (W - L - R); };
+
+  decadeTicks(lo, hi, 6).forEach(function (t) {
+    axisLine(svg, X(t), T - 6, X(t), H - Bm, RULE_SOFT);
+    label(svg, X(t), H - Bm + 16, "1 in " + tickText(-t), { size: 10 });
+  });
+  label(svg, (L + W - R) / 2, H - 8, "chance one vote decides the presidency",
+    { size: 11, fill: SOFT });
+
+  top.forEach(function (r, i) {
+    var y = T + rowH * (i + 0.5);
+    var mineRow = r.ab === mine.ab;
+    var colour = mineRow ? B : A;
+    var x = r.p > 0 ? X(Math.log10(r.p)) : L;
+    svg.appendChild(el("line", { x1: L, y1: y, x2: x, y2: y,
+      stroke: colour, "stroke-width": mineRow ? 2 : 1.5, opacity: mineRow ? 1 : 0.5 }));
+    var dot = el("circle", { cx: x, cy: y, r: mineRow ? 5.5 : 4.5, fill: colour,
+      stroke: PAPER, "stroke-width": 1.5 });
+    hoverable(dot, "<strong>" + r.name + "</strong><br>" + r.ev + " electoral votes<br>"
+      + commas(r.n) + " two-party votes<br>2024 margin " + r.mp.toFixed(2) + " points<br>"
+      + odds(r.p));
+    svg.appendChild(dot);
+    label(svg, L - 10, y + 4, r.name, { anchor: "end", size: 11,
+      fill: mineRow ? B : SOFT });
+    label(svg, x + 10, y + 4, odds(r.p).replace("1 in ", ""),
+      { anchor: "start", size: 10, fill: FAINT });
+  });
+
+  if (rank > 15) {
+    svg.appendChild(el("line", { x1: L - 100, y1: T + rowH * top.length - rowH,
+      x2: W - R, y2: T + rowH * top.length - rowH, stroke: RULE, "stroke-width": 1,
+      "stroke-dasharray": "2 4" }));
+  }
+}
+
+/* =========================================================================
+   Instrument 4 — the ladder
+   ========================================================================= */
+
+var ladSd = document.getElementById("ladSd"), ladMu = document.getElementById("ladMu");
+
+function ladderLevels() {
+  var h = DATA.house, sn = DATA.senate, sl = DATA.sler;
+  return [
+    { name: "Wyoming state house seat", n: sl.wy_house_median, races: sl.wy_house_races,
+      closest: "tied in 1994, on 3,882 votes" },
+    { name: "State house seat, any state", n: sl.median_house, races: sl.house_races,
+      closest: "eleven exact ties on record" },
+    { name: "State senate seat", n: sl.median_senate, races: sl.senate_races,
+      closest: "tied in Rhode Island, 1978" },
+    { name: "US House district", n: h.median_total, races: h.races,
+      closest: "4 votes, Indiana 8th, 1984" },
+    { name: "US Senate seat", n: sn.median_total, races: sn.races,
+      closest: "312 votes, Minnesota, 2008" },
+    { name: "The presidency", n: DATA.pres2024_two_party, races: 13,
+      closest: "537 votes in Florida, 2000" }
+  ];
+}
+
+function drawLadder() {
+  var sd = +ladSd.value / 1000, mu = +ladMu.value / 1000;
+  document.getElementById("ladSdVal").textContent = (sd * 100).toFixed(1) + " pts";
+  document.getElementById("ladMuVal").textContent =
+    mu <= 0.5005 ? "dead heat" : (100 * (mu - 0.5)).toFixed(1) + " points ahead";
+
+  var levels = ladderLevels();
+  var svg = document.getElementById("ladChart");
+  clear(svg);
+  var W = 720, H = 380, L = 78, R = 150, T = 22, Bm = 46;
+
+  var xLo = 3, xHi = Math.log10(DATA.pres2024_two_party) + 0.35;
+  var X = function (v) { return L + ((v - xLo) / (xHi - xLo)) * (W - L - R); };
+
+  var ys = levels.map(function (lv) { return Math.log10(sharePivot(lv.n, mu, sd)); });
+  var curveLo = Math.log10(sharePivot(Math.pow(10, xHi), mu, sd));
+  var curveHi = Math.log10(sharePivot(Math.pow(10, xLo), mu, sd));
+  // The coin-flip model at its single most favourable setting, a perfect tie.
+  var coin = function (n) { return Math.sqrt(2 / (Math.PI * n)); };
+  var coinHi = Math.log10(coin(Math.pow(10, xLo)));
+  var lo = Math.min(curveLo, Math.min.apply(null, ys)) - 0.4;
+  var hi = Math.max(coinHi, curveHi, Math.max.apply(null, ys)) + 0.4;
+  var Y = function (v) { return T + (1 - (v - lo) / (hi - lo)) * (H - T - Bm); };
+
+  decadeTicks(lo, hi, 7).forEach(function (t) {
+    axisLine(svg, L, Y(t), W - R, Y(t), RULE_SOFT);
+    label(svg, L - 8, Y(t) + 3, "1 in " + tickText(-t), { anchor: "end", size: 10 });
+  });
+  [3, 4, 5, 6, 7, 8].forEach(function (t) {
+    if (t > xHi) return;
+    label(svg, X(t), H - Bm + 17, tickText(t), { size: 10 });
+  });
+  axisLine(svg, L, T, L, H - Bm);
+  axisLine(svg, L, H - Bm, W - R, H - Bm);
+  label(svg, (L + W - R) / 2, H - 8, "votes cast in the election", { size: 11, fill: SOFT });
+
+  var dc = "", i, lx;
+  for (i = 0; i <= 160; i++) {
+    lx = xLo + ((xHi - xLo) * i) / 160;
+    dc += (i ? "L" : "M") + X(lx).toFixed(2) + " "
+      + Y(Math.log10(coin(Math.pow(10, lx)))).toFixed(2);
+  }
+  svg.appendChild(el("path", { d: dc, fill: "none", stroke: FAINT,
+    "stroke-width": 1.5, "stroke-dasharray": "5 4" }));
+  label(svg, X(xLo) + 8, Y(coinHi) - 8, "coin-flip model, at a perfect tie",
+    { anchor: "start", size: 10, fill: FAINT });
+
+  var d = "";
+  for (i = 0; i <= 160; i++) {
+    lx = xLo + ((xHi - xLo) * i) / 160;
+    var v = Math.log10(sharePivot(Math.pow(10, lx), mu, sd));
+    d += (i ? "L" : "M") + X(lx).toFixed(2) + " " + Y(v).toFixed(2);
+  }
+  svg.appendChild(el("path", { d: d, fill: "none", stroke: A, "stroke-width": 2 }));
+
+  // Observed near-tie frequency in 82,590 state legislative races, banded by
+  // the size of the electorate. These are counts, not model output.
+  DATA.scaling.bands.forEach(function (b) {
+    var bx = X(Math.log10(b.v)), by = Y(Math.log10(b.q));
+    if (by < T || by > H - Bm) return;
+    var sq = el("rect", { x: bx - 4, y: by - 4, width: 8, height: 8,
+      fill: "none", stroke: SOFT, "stroke-width": 1.5 });
+    hoverable(sq, "<strong>Observed</strong><br>" + commas(b.races)
+      + " state legislative races<br>near " + commas(b.v) + " votes cast<br>"
+      + odds(b.q) + " were decided by ten votes or fewer, per vote cast");
+    svg.appendChild(sq);
+  });
+
+  levels.forEach(function (lv, k) {
+    var x = X(Math.log10(lv.n)), y = Y(ys[k]);
+    var dot = el("circle", { cx: x, cy: y, r: 5, fill: B, stroke: PAPER, "stroke-width": 2 });
+    hoverable(dot, "<strong>" + lv.name + "</strong><br>median " + commas(lv.n)
+      + " votes<br>" + odds(sharePivot(lv.n, mu, sd)));
+    svg.appendChild(dot);
+    label(svg, x + 10, y + 4, lv.name, { anchor: "start", size: 11, fill: SOFT });
+  });
+
+  var tbody = document.querySelector("#ladTable tbody");
+  clear(tbody);
+  levels.forEach(function (lv) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + lv.name + "</td>"
+      + "<td class='num'>" + commas(lv.n) + "</td>"
+      + "<td class='num'>" + commas(lv.races) + "</td>"
+      + "<td class='num'>" + odds(sharePivot(lv.n, mu, sd)) + "</td>"
+      + "<td>" + lv.closest + "</td>";
+    tbody.appendChild(tr);
+  });
+}
+
+/* =========================================================================
+   Instrument 5 — primaries
+   ========================================================================= */
+
+var primYear = document.getElementById("primYear"), primSd = document.getElementById("primSd");
+
+function drawPrimaries() {
+  var year = primYear.value;
+  var sd = +primSd.value / 1000;
+  document.getElementById("primSdVal").textContent = (sd * 100).toFixed(1) + " pts";
+  var h = DATA.primaries["house" + year];
+
+  var bars = [
+    { name: "Primary, winning party", v: h.median_primary, colour: B },
+    { name: "General election", v: h.median_general, colour: A }
+  ];
+
+  var svg = document.getElementById("primChart");
+  clear(svg);
+  var W = 720, H = 260, L = 190, R = 120, T = 30, Bm = 44;
+  var max = Math.max(h.median_general, h.median_primary) * 1.06;
+  var X = function (v) { return L + (v / max) * (W - L - R); };
+  var rowH = (H - T - Bm) / bars.length;
+
+  bars.forEach(function (b, i) {
+    var y = T + rowH * i + rowH * 0.22, bh = rowH * 0.5;
+    var rect = el("rect", { x: L, y: y, width: Math.max(2, X(b.v) - L), height: bh,
+      fill: b.colour, rx: 3 });
+    hoverable(rect, "<strong>" + b.name + "</strong><br>" + commas(b.v)
+      + " votes (median)<br>" + odds(sharePivot(b.v, 0.5, sd)));
+    svg.appendChild(rect);
+    label(svg, L - 12, y + bh / 2 + 4, b.name, { anchor: "end", size: 12, fill: SOFT });
+    label(svg, X(b.v) + 10, y + bh / 2 + 4, commas(b.v),
+      { anchor: "start", size: 12, fill: INK });
+  });
+  axisLine(svg, L, H - Bm, W - R, H - Bm);
+  label(svg, (L + W - R) / 2, H - 10, "median votes cast in a US House district, " + year,
+    { size: 11, fill: SOFT });
+
+  document.getElementById("primP").textContent = odds(sharePivot(h.median_primary, 0.5, sd));
+  document.getElementById("primG").textContent = odds(sharePivot(h.median_general, 0.5, sd));
+  document.getElementById("primSafe").textContent = h.safe + " of " + h.total;
+  document.getElementById("primCaption").textContent =
+    "In " + year + ", " + h.safe + " of the " + h.total + " House seats were uncontested by "
+    + "the other major party or won by more than twenty points. In those districts the "
+    + "primary chose the officeholder and the general election ratified the choice.";
+}
+
+/* =========================================================================
+   Instrument 6 — the record
+   ========================================================================= */
+
+var recLevel = document.getElementById("recLevel");
+
+function drawRecord() {
+  var level = recLevel.value;
+  var stats = document.getElementById("recStats");
+  var tbody = document.querySelector("#recTable tbody");
+  clear(stats); clear(tbody);
+
+  var conf;
+  if (level === "house") {
+    var h = DATA.house;
+    conf = {
+      caption: "The twelve closest US House general elections since 1976",
+      stats: [
+        ["Contested races", commas(h.races)],
+        ["Decided by one vote", h.le1 === 0 ? "none" : commas(h.le1)],
+        ["Decided by ten or fewer", commas(h.le10)]
+      ],
+      rows: h.closest.map(function (r) {
+        return [r.y + " " + r.ab + "-" + r.d, commas(r.m), commas(r.t),
+                (100 * r.m / r.t).toFixed(3) + "%"];
+      })
+    };
+  } else if (level === "senate") {
+    var s = DATA.senate;
+    conf = {
+      caption: "The ten closest US Senate general elections since 1976",
+      stats: [
+        ["Races", commas(s.races)],
+        ["Decided by a hundred or fewer", s.le100 === 0 ? "none" : commas(s.le100)],
+        ["Decided by a thousand or fewer", commas(s.le1000)]
+      ],
+      rows: s.closest.map(function (r) {
+        return [r.y + " " + r.ab, commas(r.m), commas(r.t),
+                (100 * r.m / r.t).toFixed(3) + "%"];
+      })
+    };
+  } else {
+    var sl = DATA.sler;
+    conf = {
+      caption: "State legislative races decided by one vote or tied, 1967–2016",
+      stats: [
+        ["Contested races", commas(sl.contested)],
+        ["Exact ties", commas(sl.ties)],
+        ["Decided by one vote or fewer", commas(sl.margin_le_1)]
+      ],
+      rows: sl.closest.map(function (r) {
+        return [r.year + " " + r.state.toUpperCase() + " " + r.chamber + " "
+                + String(r.district).replace(/\.0$/, ""),
+                commas(r.margin), commas(r.total),
+                (100 * r.margin / r.total).toFixed(4) + "%"];
+      })
+    };
+  }
+
+  conf.stats.forEach(function (s) {
+    var d = document.createElement("div");
+    d.className = "stat";
+    d.innerHTML = "<p class='stat-label'>" + s[0] + "</p><p class='stat-value'>" + s[1] + "</p>";
+    stats.appendChild(d);
+  });
+  document.getElementById("recCaption").textContent = conf.caption;
+  conf.rows.forEach(function (r) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + r[0] + "</td><td class='num'>" + r[1]
+      + "</td><td class='num'>" + r[2] + "</td><td class='num'>" + r[3] + "</td>";
+    tbody.appendChild(tr);
+  });
+}
+
+/* =========================================================================
+   Instrument 7 — the expected-value calculation
+   ========================================================================= */
+
+var evRace = document.getElementById("evRace"), evB = document.getElementById("evB"),
+    evC = document.getElementById("evC"), evWage = document.getElementById("evWage"),
+    evAlt = document.getElementById("evAlt");
+
+var lastEC = null;   // filled by drawElectoral, so the two instruments agree
+
+function evRaces() {
+  var stateRow = null;
+  if (lastEC) {
+    lastEC.forEach(function (r) { if (r.ab === ecState.value) stateRow = r; });
+  }
+  return [
+    { key: "pres", name: "The presidency, voting from " + (stateRow ? stateRow.name : "your state"),
+      p: stateRow ? stateRow.p : 0, affected: DATA.pres2024_two_party,
+      note: "Chance computed from the 2024 map at the settings above." },
+    { key: "senate", name: "A US Senate seat (median race)",
+      n: DATA.senate.median_total, affected: DATA.senate.median_total,
+      note: "A race believed to be close." },
+    { key: "house", name: "A US House seat (median race)",
+      n: DATA.house.median_total, affected: DATA.house.median_total,
+      note: "A race believed to be close." },
+    { key: "sen", name: "A state senate seat (median race)",
+      n: DATA.sler.median_senate, affected: DATA.sler.median_senate,
+      note: "A race believed to be close." },
+    { key: "hou", name: "A state house seat (median race)",
+      n: DATA.sler.median_house, affected: DATA.sler.median_house,
+      note: "A race believed to be close." },
+    { key: "wy", name: "A Wyoming state house seat (median "
+        + commas(DATA.sler.wy_house_median) + " votes)",
+      n: DATA.sler.wy_house_median, affected: DATA.sler.wy_house_median,
+      note: "A race believed to be close." }
+  ];
+}
+
+function fillRaceOptions() {
+  var chosen = evRace.value;
+  clear(evRace);
+  evRaces().forEach(function (r) {
+    var o = document.createElement("option");
+    o.value = r.key; o.textContent = r.name;
+    evRace.appendChild(o);
+  });
+  evRace.value = chosen || "pres";
+  if (!evRace.value) evRace.value = "pres";
+}
+
+function money(x) {
+  if (x >= 1000) return "$" + commas(x);
+  if (x >= 1) return "$" + x.toFixed(2);
+  if (x >= 0.01) return (100 * x).toFixed(1) + " cents";
+  if (x >= 0.0001) return (100 * x).toFixed(3) + " cents";
+  if (x <= 0) return "nothing";
+  return "$" + x.toExponential(1);
+}
+
+function drawExpectedValue() {
+  fillRaceOptions();
+  var races = evRaces(), race = races[0];
+  races.forEach(function (r) { if (r.key === evRace.value) race = r; });
+
+  var B = Math.pow(10, +evB.value);
+  var minutes = +evC.value;
+  var wage = +evWage.value;
+  var altRaw = +evAlt.value;
+  var alpha = altRaw === 0 ? 0 : Math.pow(10, -3 * (100 - altRaw) / 100);
+
+  document.getElementById("evBVal").textContent = "$" + commas(B);
+  document.getElementById("evCVal").textContent = minutes + " min";
+  document.getElementById("evWageVal").textContent = "$" + wage;
+  document.getElementById("evAltVal").textContent =
+    altRaw === 0 ? "none" : "weight " + (alpha < 0.01 ? alpha.toFixed(4) : alpha.toFixed(3));
+
+  var p = race.p !== undefined ? race.p : sharePivot(race.n, 0.5, 0.04);
+  var weighted = B * (1 + alpha * (race.affected - 1));
+  var benefit = p * weighted;
+  var cost = wage * minutes / 60;
+
+  document.getElementById("evBenefit").textContent = money(benefit);
+  document.getElementById("evBenefitNote").textContent =
+    odds(p) + (alpha > 0
+      ? ", times " + commas(race.affected) + " people at weight "
+        + (alpha < 0.01 ? alpha.toFixed(4) : alpha.toFixed(3))
+      : ", times your own valuation");
+  document.getElementById("evCost").textContent = money(cost);
+
+  var ratio = cost > 0 ? benefit / cost : Infinity;
+  document.getElementById("evVerdict").textContent =
+    benefit >= cost ? "worth the trip" : "not worth the trip";
+  document.getElementById("evVerdictNote").textContent =
+    benefit >= cost
+      ? "The expected benefit exceeds the cost by a factor of " +
+        (ratio > 1000 ? commas(ratio) : ratio.toFixed(1)) + "."
+      : "The cost exceeds the expected benefit by a factor of " +
+        (ratio > 0 ? (1 / ratio > 1000 ? commas(1 / ratio) : (1 / ratio).toFixed(1)) : "—") + ".";
+}
+
+/* --- bibliography ------------------------------------------------------- */
+
+(function () {
+  var ul = document.getElementById("bibliography");
+  if (!ul || !DATA.bibliography) return;
+  DATA.bibliography.forEach(function (b) {
+    var li = document.createElement("li");
+    li.innerHTML = b;
+    ul.appendChild(li);
+  });
+})();
+
+/* --- deciding states and the cheapest change ---------------------------- */
+
+(function () {
+  var tbody = document.querySelector("#tipTable tbody");
+  Object.keys(DATA.flip).sort().forEach(function (y) {
+    var f = DATA.flip[y];
+    var share = f.switchers / f.national_total;
+    var tr = document.createElement("tr");
+    if (share < 0.0005) tr.className = "marked";
+    tr.innerHTML = "<td>" + y + "</td>"
+      + "<td class='num'>" + f.winner + " " + f.ev_winner + "&ndash;" + f.ev_loser + "</td>"
+      + "<td>" + f.tip_state + "</td>"
+      + "<td class='num'>" + commas(f.tip_margin) + "</td>"
+      + "<td>" + f.states.join(", ") + "</td>"
+      + "<td class='num'>" + commas(f.switchers) + "</td>"
+      + "<td class='num'>" + (100 * share).toFixed(3) + "%</td>";
+    tbody.appendChild(tr);
+  });
+})();
+
+/* --- the opening question ----------------------------------------------- */
+
+document.getElementById("guessBtn").addEventListener("click", function () {
+  var g = document.getElementById("guessInput").value;
+  var reaction = "";
+  if (g !== "") {
+    var n = +g;
+    reaction = n === 0 ? "Your guess was right."
+      : n <= 3 ? "You guessed " + commas(n) + ", which is close."
+      : "You guessed " + commas(n) + ".";
+  }
+  document.getElementById("guessReaction").textContent = reaction;
+  document.getElementById("guessAnswer").hidden = false;
+});
+
+/* --- wiring ------------------------------------------------------------- */
+
+function bind(ids, fn) {
+  ids.forEach(function (id) {
+    var node = document.getElementById(id);
+    node.addEventListener("input", fn);
+    node.addEventListener("change", fn);
+  });
+  fn();
+}
+
+bind(["cfP", "cfN"], drawCoinFlip);
+bind(["fmN", "fmMu", "fmSd"], drawForecast);
+bind(["ecState", "ecNat", "ecSt"], function () { drawElectoral(); drawExpectedValue(); });
+bind(["ladSd", "ladMu"], drawLadder);
+bind(["primYear", "primSd"], drawPrimaries);
+bind(["recLevel"], drawRecord);
+bind(["evRace", "evB", "evC", "evWage", "evAlt"], drawExpectedValue);
+
+})();
+
+</script>
+</body>
+</html>
